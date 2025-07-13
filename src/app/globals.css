@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1D222A;
+  --foreground: #FFFFFF;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-family-montserrat: var(--font-montserrat);
+  
+  /* Primary Color Scale (Gold) */
+  --color-primary-100: #fefbf0;
+  --color-primary-200: #fcf6e0;
+  --color-primary-300: #f9f0c1;
+  --color-primary-400: #f5e382;
+  --color-primary-500: #D4AF37;
+  --color-primary-600: #b8941e;
+  --color-primary-700: #9a7a16;
+  --color-primary-800: #7c6011;
+  --color-primary-900: #5e470d;
+  
+  /* Secondary Color Scale (Dark Gray) */
+  --color-secondary-100: #f8f8f8;
+  --color-secondary-200: #f0f0f0;
+  --color-secondary-300: #d4d4d4;
+  --color-secondary-400: #a8a8a8;
+  --color-secondary-500: #212529;
+  --color-secondary-600: #1e2126;
+  --color-secondary-700: #1a1d21;
+  --color-secondary-800: #17191c;
+  --color-secondary-900: #131518;
+  
+  /* Third Color Scale (Emerald Green) */
+  --color-third-100: #ecfdf5;
+  --color-third-200: #d1fae5;
+  --color-third-300: #a7f3d0;
+  --color-third-400: #6ee7b7;
+  --color-third-500: #059669;
+  --color-third-600: #047857;
+  --color-third-700: #065f46;
+  --color-third-800: #064e3b;
+  --color-third-900: #023b30;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1D222A;
+    --foreground: #FFFFFF;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+@utility flex-center {
+  @apply flex items-center justify-center;
 }
