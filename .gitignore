@@ -10,6 +10,11 @@
 !.yarn/releases
 !.yarn/versions
 
+# images
+*.HEIC
+*.heic
+*.jpg
+
 # testing
 /coverage
 
