@@ -1,0 +1,167 @@
+// Enhanced Prisma schema for construction/remodeling business
+// Optimized for scalability and professional use
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  VIEWER
+}
+
+enum ProjectType {
+  CUSTOM_HOME
+  BATHROOM_REMODEL
+  KITCHEN_REMODEL
+  FENCES
+  PATIO
+  FLOORING
+  PAINTING
+  ROOFING
+  CONCRETE
+  WINDOWS
+  OTHER
+}
+
+enum ProjectStatus {
+  UNCONFIRMED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ProjectStart {
+  ASAP
+  NEXT_3_MONTHS
+  NEXT_6_MONTHS
+  NEXT_6_MONTHS_PLUS
+}
+
+enum FileType {
+  PDF
+  DOC
+  DOCX
+}
+
+model AuthenticatedUser {
+  id           String    @id @default(uuid())
+  s3Key        String    @unique @map("s3_key")
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  role         Role      @default(VIEWER)
+  lastLogin    DateTime? @map("last_login")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("authenticated_users")
+}
+
+model ProjectTicket {
+  id            String        @id @default(uuid())
+  s3Key         String        @unique @map("s3_key")
+  name          String
+  email         String
+  phone         String
+  zipCode       String        @map("zip_code")
+  projectType   ProjectType   @map("project_type")
+  projectStart  ProjectStart  @map("project_start")
+  projectStatus ProjectStatus @default(UNCONFIRMED) @map("project_status")
+  message       String        @db.Text
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Add indexes for common queries
+  @@index([projectStatus])
+  @@index([projectType])
+  @@index([createdAt])
+  @@map("project_tickets")
+}
+
+model CareerTicket {
+  id         String   @id @default(uuid())
+  s3Key      String   @unique @map("s3_key")
+  name       String
+  email      String
+  phone      String
+  resumeUrl  String   @map("resume_url") // Store file URL/path
+  resumeName String   @map("resume_name") // Original filename
+  resumeSize Int      @map("resume_size") // File size in bytes
+  resumeType FileType @default(PDF) @map("resume_type")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt])
+  @@map("career_tickets")
+}
+
+// Unified Image model for better management
+model Image {
+  id         String      @id @default(uuid())
+  s3Key      String      @unique @map("s3_key")
+  url        String      @unique
+  filename   String // Original filename
+  alt        String? // Alt text for accessibility
+  title      String? // Image title
+  width      Int? // Image width in pixels
+  height     Int? // Image height in pixels
+  size       Int? // File size in bytes
+  mimeType   String      @map("mime_type") // e.g., "image/jpeg"
+  category   ProjectType // What type of project this image represents
+  isBackdrop Boolean     @default(false) @map("is_backdrop") // True for backdrop images
+  isActive   Boolean     @default(true) @map("is_active") // Soft delete capability
+  sortOrder  Int         @default(0) @map("sort_order") // For ordering images
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  // Add indexes for efficient querying
+  @@index([category])
+  @@index([isBackdrop])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@index([category, isBackdrop, isActive])
+  @@map("images")
+}
+
+// Optional: For future scalability if you need image collections/albums
+model ImageCollection {
+  id          String      @id @default(uuid())
+  s3Key       String      @unique @map("s3_key")
+  name        String
+  description String?     @db.Text
+  category    ProjectType
+  isActive    Boolean     @default(true) @map("is_active")
+  sortOrder   Int         @default(0) @map("sort_order")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations for many-to-many if needed in future
+  // images      ImageCollectionImage[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("image_collections")
+}
+
+// Example of how you might implement many-to-many relationship
+// model ImageCollectionImage {
+//   id           String          @id @default(uuid())
+//   imageId      String          @map("image_id")
+//   collectionId String          @map("collection_id")
+//   sortOrder    Int             @default(0) @map("sort_order")
+//   createdAt    DateTime        @default(now()) @map("created_at")
+//   
+//   image        Image           @relation(fields: [imageId], references: [id], onDelete: Cascade)
+//   collection   ImageCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+//   
+//   @@unique([imageId, collectionId])
+//   @@map("image_collection_images")
+// }

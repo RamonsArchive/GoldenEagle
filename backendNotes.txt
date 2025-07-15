@@ -1,0 +1,174 @@
+// 1. S3 Bucket Policy for Mixed Access (One Bucket Approach)
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadForGallery",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-bucket-name/gallery/*"
+    },
+    {
+      "Sid": "PublicReadForBackdrops",
+      "Effect": "Allow", 
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-bucket-name/backdrops/*"
+    }
+  ]
+}
+
+// 2. CloudFront Distribution Configuration
+{
+  "DistributionConfig": {
+    "CallerReference": "your-company-gallery-2024",
+    "Origins": {
+      "Items": [
+        {
+          "Id": "S3-your-bucket-name",
+          "DomainName": "your-bucket-name.s3.us-east-1.amazonaws.com",
+          "S3OriginConfig": {
+            "OriginAccessIdentity": ""
+          }
+        }
+      ]
+    },
+    "DefaultCacheBehavior": {
+      "TargetOriginId": "S3-your-bucket-name",
+      "ViewerProtocolPolicy": "redirect-to-https",
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6", // Managed-CachingOptimized
+      "Compress": true
+    },
+    "Comment": "Construction Company Gallery CDN",
+    "Enabled": true,
+    "PriceClass": "PriceClass_100" // US, Canada, Europe only (cheaper)
+  }
+}
+
+// 3. Updated Server Actions with CloudFront
+// lib/actions/upload.ts
+export async function uploadToS3(file: File, folder: string = 'gallery') {
+  const fileBuffer = Buffer.from(await file.arrayBuffer());
+  const fileName = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+  
+  const uploadParams = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+    Key: fileName,
+    Body: fileBuffer,
+    ContentType: file.type,
+    // Add cache headers for better performance
+    CacheControl: 'max-age=31536000', // 1 year cache
+    Metadata: {
+      'uploaded-by': 'gallery-admin',
+      'upload-date': new Date().toISOString()
+    }
+  };
+
+  try {
+    const command = new PutObjectCommand(uploadParams);
+    await s3Client.send(command);
+    
+    // Use CloudFront URL for better performance (if you set it up)
+    const publicUrl = process.env.CLOUDFRONT_DOMAIN 
+      ? `https://${process.env.CLOUDFRONT_DOMAIN}/${fileName}`
+      : `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    
+    return {
+      url: publicUrl,
+      key: fileName,
+      size: file.size,
+      mimeType: file.type,
+    };
+  } catch (error) {
+    console.error('Error uploading to S3:', error);
+    throw new Error('Failed to upload file');
+  }
+}
+
+// 4. Environment Variables Setup
+// .env.local
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET_NAME=your-bucket-name
+CLOUDFRONT_DOMAIN=d1234567890.cloudfront.net  // Optional, for CDN
+
+// 5. Folder Structure Recommendation
+your-bucket-name/
+├── gallery/           # Public - gallery images
+│   ├── kitchen/
+│   ├── bathroom/
+│   └── ...
+├── backdrops/         # Public - backdrop images
+├── private/           # Private - resumes, admin docs
+│   ├── resumes/
+│   └── admin/
+└── temp/             # Private - temporary uploads
+
+// 6. Updated Schema Fields (based on your structure)
+// This matches your existing schema perfectly
+model Image {
+  id         String      @id @default(uuid())
+  s3Key      String      @unique @map("s3_key")       // "gallery/kitchen/img1.jpg"
+  url        String      @unique                      // CloudFront or S3 URL
+  filename   String                                   // "kitchen-remodel-1.jpg"
+  alt        String?
+  title      String?
+  width      Int?
+  height     Int?
+  size       Int?
+  mimeType   String      @map("mime_type")
+  category   ProjectType
+  isBackdrop Boolean     @default(false) @map("is_backdrop")
+  isActive   Boolean     @default(true) @map("is_active")
+  sortOrder  Int         @default(0) @map("sort_order")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([isBackdrop])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@index([category, isBackdrop, isActive])
+  @@map("images")
+}
+
+model CareerTicket {
+  id         String   @id @default(uuid())
+  s3Key      String   @unique @map("s3_key")          // "private/resumes/resume1.pdf"
+  name       String
+  email      String
+  phone      String
+  resumeUrl  String   @map("resume_url")             // Only store S3 key for private files
+  resumeName String   @map("resume_name")
+  resumeSize Int      @map("resume_size")
+  resumeType FileType @default(PDF) @map("resume_type")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt])
+  @@map("career_tickets")
+}
+
+// 7. Cost Estimation (Monthly)
+// For a construction company gallery with ~1000 images (100MB total)
+{
+  "s3Storage": "$0.023/GB = $0.002/month",
+  "s3Requests": "GET requests ~$0.0004/1000 = $0.01/month", 
+  "cloudFront": "First 1TB free, then $0.085/GB",
+  "totalEstimate": "$5-15/month with moderate traffic",
+  "withoutCloudFront": "$2-5/month"
+}
+
+// 8. Steps to Make Existing Bucket Public
+// AWS Console Steps:
+// 1. Go to S3 Console
+// 2. Select your bucket
+// 3. Go to "Permissions" tab
+// 4. Edit "Block public access" - uncheck "Block all public access"
+// 5. Add the bucket policy above
+// 6. Save changes
+
+// CLI Command to make specific folders public:
+aws s3api put-bucket-policy --bucket your-bucket-name --policy file://bucket-policy.json
