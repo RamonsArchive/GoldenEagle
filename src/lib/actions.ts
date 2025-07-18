@@ -12,6 +12,8 @@ import { parseServerActionResponse } from './utils';
 import { glob } from 'glob';
 import fs from 'fs';
 import path from 'path';
+import { useRateLimiter } from './rateLimiter';
+import { cookies } from "next/headers";
 
 export async function uploadImagesToS3(formData: FormData) {
   try {
@@ -161,7 +163,8 @@ async function uploadFileToS3(filePath: string, folder: string = 'gallery') {
 export const uploadAllImagesToS3 = async (
   includePaths: string[], 
   excludePaths: string[] = [],
-  isBackdrop: boolean = false 
+  isBackdrop: boolean,
+  category: string = "OTHER"
 ) => {
   try {
     let allImages: string[] = [];
@@ -217,8 +220,8 @@ export const uploadAllImagesToS3 = async (
             alt: `Gallery image`,
             size: uploadResult.size,
             mimeType: uploadResult.mimeType,
-            category: 'OTHER' as keyof typeof Project_Type,
-            isBackdrop: false,
+            category: category as keyof typeof Project_Type,
+            isBackdrop: isBackdrop,
             s3Key: uploadResult.key,
           }
         });
@@ -254,4 +257,22 @@ export const uploadAllImagesToS3 = async (
       error: "Failed to upload images from path"
     });
   }
+}
+
+// export const fetchHeroData = async () => {
+//   const isRateLimited = await useRateLimiter("fetchHeroData");
+//   if (isRateLimited.status === "ERROR") {
+//     return isRateLimited;
+//   }
+
+//   const heroData = await prisma.hero.findUnique({
+//     where: { id: 1 },
+//   });
+//   return parseServerActionResponse({
+// }
+
+export const getUserId = async () => { 
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("userId")?.value;
+  return userId;
 }
