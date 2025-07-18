@@ -12,17 +12,15 @@ export const navLinks = [
     {id: "contact", title: "Contact",
     },
 ]
-
-export const heroImages = [
+export const heroImages = 
     {
         backdrops: [
-            "backdrops/1752821359144-mountain3.jpg"
+            "backdrops/1752873842088-mountain3.jpg"
         ],
         gallery: [
             "gallery/1752818940164-homeImage4.jpg",
             "gallery/1752818940962-homeImage3.jpg",
             "gallery/1752818948885-homeImage11.jpg",
-            "1752819316463-homeRemodelImage1.jpg",
+            "gallery/1752819316463-homeRemodelImage1.jpg",
         ]
     }
-]

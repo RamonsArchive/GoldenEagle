@@ -14,6 +14,7 @@ import fs from 'fs';
 import path from 'path';
 import { useRateLimiter } from './rateLimiter';
 import { cookies } from "next/headers";
+import { heroImages } from '@/constants';
 
 export async function uploadImagesToS3(formData: FormData) {
   try {
@@ -275,4 +276,65 @@ export const getUserId = async () => {
   const cookieStore = await cookies();
   const userId = cookieStore.get("userId")?.value;
   return userId;
+}
+
+export const fetchHeroData = async () => {
+  try {
+    const heorGallery = await prisma.image.findMany({
+      where: {
+        s3Key: {
+          in: heroImages.gallery
+        }
+      },
+      select: {
+        url: true,
+        alt: true,
+        s3Key: true,
+        isBackdrop: true,
+        category: true,
+      }
+    })
+    if (!heorGallery) {
+      return parseServerActionResponse({
+        status: "ERROR",
+        error: "No hero gallery images found"
+      });
+    }
+
+    const heroBackdrop = await prisma.image.findFirst({
+      where: {
+        s3Key: {
+          in: heroImages.backdrops
+        }
+      },
+      select: {
+        url: true,
+        alt: true,
+        s3Key: true,
+        isBackdrop: true,
+        category: true,
+      }
+    })
+
+    if (!heroBackdrop) {
+      return parseServerActionResponse({
+        status: "ERROR",
+        error: "No hero backdrop image found"
+      });
+    }
+
+    return parseServerActionResponse({
+      status: "SUCCESS",
+      error: "",
+      heroGallery: heorGallery,
+      heroBackdrop: heroBackdrop
+    })
+  } catch (error) {
+    console.error("Error fetching hero data", error);
+    return parseServerActionResponse({
+      status: "ERROR",
+      error: "Failed to fetch hero data"
+    });
+  }
+  
 }

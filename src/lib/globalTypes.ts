@@ -9,7 +9,6 @@ export const Project_Type = {
     ROOFING: "ROOFING",
     CONCRETE: "CONCRETE",
     WINDOWS: "WINDOWS",
-    BACKDROP: "BACKDROP",
     OTHER: "OTHER",
   } as const;
 

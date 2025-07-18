@@ -59,17 +59,16 @@ export default function ImageUploadForm() {
       const includePaths = [
         //"public/assets/BathRoomRemodel/**/*.jpg",
         //"public/assets/Concrete/**/*.jpg",
-        // "public/assets/Custom Home/**/*.jpg",
         //"public/assets/Fences/**/*.jpg",
         //"public/assets/Flooring/**/*.jpg",
-        //"public/assets/KitchenRemodel/**/*.jpg",
+        // "public/assets/KitchenRemodel/**/*.jpg",
         //"public/assets/Patio/**/*.jpg",
-        // "public/assets/Painting/**/*.jpg",
-        // "public/assets/Roofing/**/*.jpg",
+        //"public/assets/Painting/**/*.jpg",
+        //"public/assets/Roofing/**/*.jpg",
         //"public/assets/Windows/**/*.jpg",
         // "public/assets/Other/**/*.jpg",
-        //"public/assets/HomeBuilding/**/*.jpg", // custom home images
-        "public/assets/Backdrops/**/*",
+        "public/assets/CustomHome/**/*.jpg", // custom home images
+        //"public/assets/Backdrops/**/*",
       ];
 
       //const excludePaths = ["public/assets/Backdrops/**/*"];
