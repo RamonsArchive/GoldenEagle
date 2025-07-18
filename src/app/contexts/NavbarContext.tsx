@@ -32,6 +32,7 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
     setScreenWidth(window.innerWidth);
 
     const handleResize = () => {
+      console.log("resizing to", window.innerWidth);
       setScreenWidth(window.innerWidth);
     };
 
@@ -39,7 +40,7 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isMobile = screenWidth < 480;
+  const isMobile = screenWidth < 640;
 
   // Smooth scroll to section function
   const scrollToSection = (sectionId: string) => {

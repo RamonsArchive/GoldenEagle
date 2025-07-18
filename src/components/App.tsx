@@ -1,12 +1,7 @@
 "use client";
-import Navbar from "./Navbar";
 
 const App = () => {
-  return (
-    <div>
-      <Navbar />
-    </div>
-  );
+  return <div></div>;
 };
 
 export default App;
