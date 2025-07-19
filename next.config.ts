@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "goldeneagle.data.s3.us-east-2.amazonaws.com",
+        hostname: "goldeneagle-data.s3.us-east-2.amazonaws.com",
         pathname: "/**",
       },
     ],

@@ -10,8 +10,7 @@ const Home = async () => {
   console.log(heroData);
 
   return (
-    <div className="home-page">
-      <ImageUploader />
+    <div className="flex flex-col w-full h-[calc(100vh+(30rem))]">
       <Hero heroData={heroData} />
     </div>
   );

@@ -76,29 +76,3 @@ body {
 @utility home-page {
   @apply flex flex-col justify-center items-center w-full h-[calc(100vh-(-10rem))]; 
 }
-
-@keyframes menuSlideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes menuSlideOut {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
-.menu-slide-in {
-  animation: menuSlideIn 300ms ease-in-out forwards;
-}
-
-.menu-slide-out {
-  animation: menuSlideOut 300ms ease-in-out forwards;
-}

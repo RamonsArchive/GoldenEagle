@@ -17,3 +17,8 @@ export type NavLinkType = {
   id: string;
   title: string;
 }
+
+export type HeroImage = {
+  id: number;
+  url: string;
+}
