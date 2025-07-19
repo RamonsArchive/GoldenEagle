@@ -38,36 +38,70 @@ const Hero = ({ heroData }: { heroData: any }) => {
       type: "lines",
     });
 
-    console.log("heroText", heroText);
-    console.log("heroSubText", heroSubText);
+    const heroLines = heroText.lines;
+    const heroSubLines = heroSubText.lines;
 
-    const tl = gsap.timeline({
+    // initital anmation for hero text non scroll trigger
+
+    const initalTl = gsap.timeline({
+      delay: 0.05,
+    });
+    initalTl
+      .from(heroLines, {
+        opacity: 0,
+        yPercent: 100,
+        duration: 0.2,
+        stagger: 0.05,
+        delay: 0.2,
+      })
+      .from(heroSubLines, {
+        opacity: 0,
+        yPercent: 100,
+        duration: 0.2,
+        stagger: 0.05,
+        delay: 0.2,
+      });
+
+    const scrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: heroTextContainerRef.current,
         start: "top top",
-        end: "bottom bottom",
-        scrub: true,
+        end: "bottom top",
+        scrub: 1,
         markers: true,
       },
     });
 
-    tl.from(heroText.lines, {
-      opacity: 0,
-      y: -100,
-      duration: 0.3,
-      delay: 0.3,
-      ease: "power2.inOut",
-      stagger: 0.1,
-    });
-
-    tl.from(heroSubText.lines, {
-      opacity: 0,
-      y: -100,
-      duration: 0.3,
-      delay: 0.3,
-      ease: "power2.inOut",
-      stagger: 0.1,
-    });
+    scrollTl
+      .fromTo(
+        heroLines,
+        {
+          opacity: 1,
+          yPercent: 0,
+        },
+        {
+          opacity: 0,
+          yPercent: -100,
+          duration: 0.3,
+          ease: "power2.inOut",
+          stagger: 0.05,
+        }
+      )
+      .fromTo(
+        heroSubLines,
+        {
+          opacity: 1,
+          yPercent: 0,
+        },
+        {
+          opacity: 0,
+          yPercent: -100,
+          duration: 0.2,
+          ease: "power2.inOut",
+          stagger: 0.05,
+        },
+        "-=0.25"
+      );
   }, []);
 
   const calculateImageIndex = (index: number) => {
