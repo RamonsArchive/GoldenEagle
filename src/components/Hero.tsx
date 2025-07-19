@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { use, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { HeroImage } from "@/lib/globalTypes";
@@ -15,8 +15,83 @@ const Hero = ({ heroData }: { heroData: any }) => {
   const { heroGallery, heroBackdrop } = heroData;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroTextContainerRef = useRef<HTMLDivElement>(null);
+  const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
+  const isAnimatingRef = useRef(false);
 
   console.log(heroData);
+
+  useEffect(() => {
+    const startAutoRotation = () => {
+      if (autoRotateRef.current) {
+        clearInterval(autoRotateRef.current);
+      }
+
+      autoRotateRef.current = setInterval(() => {
+        if (!isAnimatingRef.current) {
+          handleImageTransition("right");
+        }
+      }, 3000);
+    };
+
+    const timer = setTimeout(startAutoRotation, 2000);
+
+    return () => {
+      if (autoRotateRef.current) {
+        clearInterval(autoRotateRef.current);
+      }
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  });
+
+  const restartAutoRotation = () => {
+    if (autoRotateRef.current) {
+      clearInterval(autoRotateRef.current);
+      autoRotateRef.current = setInterval(() => {
+        if (!isAnimatingRef.current) {
+          handleImageTransition("right");
+        }
+      }, 3000);
+    }
+  };
+
+  const handleArrowClick = (direction: "left" | "right") => {
+    handleImageTransition(direction);
+    restartAutoRotation();
+  };
+
+  const handleImageTransition = (direction: "left" | "right") => {
+    if (isAnimatingRef.current) return;
+
+    isAnimatingRef.current = true;
+
+    // Fade out all images
+    gsap.to(".hero-image", {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.inOut",
+      onComplete: () => {
+        // Update image index
+        if (direction === "left") {
+          setCurrentImageIndex(calculateImageIndex(currentImageIndex - 1));
+        } else {
+          setCurrentImageIndex(calculateImageIndex(currentImageIndex + 1));
+        }
+
+        // Fade in new images after a brief delay
+        gsap.to(".hero-image", {
+          opacity: 1,
+          duration: 0.2,
+          ease: "power2.inOut",
+          delay: 0.1,
+          onComplete: () => {
+            isAnimatingRef.current = false;
+          },
+        });
+      },
+    });
+  };
 
   // defualt animations for hero section
   useGSAP(() => {
@@ -61,6 +136,18 @@ const Hero = ({ heroData }: { heroData: any }) => {
         stagger: 0.05,
         delay: 0.2,
       });
+    gsap.from("#left-hero-arrow", {
+      opacity: 0,
+      duration: 0.3,
+      delay: 1.2,
+      xPercent: -100,
+    });
+    gsap.from("#right-hero-arrow", {
+      opacity: 0,
+      duration: 0.3,
+      delay: 1.2,
+      xPercent: 100,
+    });
 
     const scrollTl = gsap.timeline({
       scrollTrigger: {
@@ -68,7 +155,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
         start: "top top",
         end: "bottom top",
         scrub: 1,
-        markers: true,
       },
     });
 
@@ -96,20 +182,65 @@ const Hero = ({ heroData }: { heroData: any }) => {
         {
           opacity: 0,
           yPercent: -100,
-          duration: 0.2,
+          duration: 0.3,
           ease: "power2.inOut",
           stagger: 0.05,
         },
-        "-=0.25"
+        "-=0.1"
       );
+
+    gsap.fromTo(
+      "#left-hero-arrow",
+      {
+        opacity: 1,
+        xPercent: 0,
+      },
+      {
+        scrollTrigger: {
+          trigger: "#hero-container",
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+          markers: true,
+        },
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.inOut",
+        xPercent: -100,
+      }
+    );
+
+    gsap.fromTo(
+      "#right-hero-arrow",
+      {
+        opacity: 1,
+        xPercent: 0,
+      },
+      {
+        scrollTrigger: {
+          trigger: "#hero-container",
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+          markers: true,
+        },
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.inOut",
+        xPercent: 100,
+      }
+    );
   }, []);
 
   const calculateImageIndex = (index: number) => {
-    return index % heroGallery.length;
+    return (index + heroGallery.length) % heroGallery.length;
   };
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-(3.25rem))]">
+    <div
+      id="hero-container"
+      className="flex flex-col w-full h-[calc(100vh-(3.25rem))]"
+    >
       <div className="xs:hidden flex flex-col w-full h-full">
         <div className="relative flex w-full h-[60%] overflow-hidden">
           {/* main image with text */}
@@ -117,7 +248,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
             src={heroGallery[calculateImageIndex(currentImageIndex)].url}
             alt={`Hero Image ${currentImageIndex + 1}`}
             fill
-            className="object-cover object-top"
+            className="hero-image"
           />
           <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col justify-center items-center">
             <div
@@ -135,13 +266,25 @@ const Hero = ({ heroData }: { heroData: any }) => {
               </p>
             </div>
           </div>
-          <div className="absolute top-[90%] left-[35%]">
-            <div className="flex items-center justify-center p-1 cursor-pointer rounded-full bg-gray-800/40 hover:bg-gray-800/60 active:scale-95 transition-all duration-300">
+          <div
+            id="left-hero-arrow"
+            className="absolute top-[90%] left-[35%] z-10"
+          >
+            <div
+              className="flex items-center justify-center p-1 cursor-pointer rounded-full bg-gray-800/40 hover:bg-gray-800/60 active:scale-95 transition-all duration-300"
+              onClick={() => handleArrowClick("left")}
+            >
               <ChevronLeft className="w-6 h-6 text-white" />
             </div>
           </div>
-          <div className="absolute top-[90%] right-[35%]">
-            <div className="flex items-center justify-center p-1 cursor-pointer rounded-full bg-gray-800/40 hover:bg-gray-800/60 active:scale-95 transition-all duration-300">
+          <div
+            id="right-hero-arrow"
+            className="absolute top-[90%] right-[35%] z-10"
+          >
+            <div
+              className="flex items-center justify-center p-1 cursor-pointer rounded-full bg-gray-800/40 hover:bg-gray-800/60 active:scale-95 transition-all duration-300"
+              onClick={() => handleArrowClick("right")}
+            >
               <ChevronRight className="w-6 h-6 text-white" />
             </div>
           </div>
@@ -156,7 +299,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 }
                 alt={`Hero Image ${currentImageIndex + 1}`}
                 fill
-                className="object-cover object-top"
+                className="hero-image"
               />
             </div>
             <div className="relative w-full h-full justify-center items-center">
@@ -166,7 +309,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 }
                 alt={`Hero Image ${currentImageIndex + 2}`}
                 fill
-                className="object-cover object-top"
+                className="hero-image"
               />
             </div>
           </div>

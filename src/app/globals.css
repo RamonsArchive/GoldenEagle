@@ -76,3 +76,7 @@ body {
 @utility home-page {
   @apply flex flex-col justify-center items-center w-full h-[calc(100vh-(-10rem))]; 
 }
+
+@utility hero-image {
+  @apply object-cover object-top;
+}
