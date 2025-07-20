@@ -77,6 +77,18 @@ body {
   @apply flex flex-col justify-center items-center w-full h-[calc(100vh-(-10rem))]; 
 }
 
+@utility hero-title {
+  @apply opacity-0 text-[28px] md:text-[32px] lg:text-[36px] w-full xl:text-[50px] font-montserrat font-bold text-white;
+}
+
+@utility hero-subtitle {
+  @apply opacity-0 text-[16px] w-full font-montserrat font-medium text-white;
+}
+
 @utility hero-image {
   @apply object-cover object-top;
+}
+
+@utility hero-text-hidden {
+  @apply hidden transform -translate-y-full;
 }

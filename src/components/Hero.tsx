@@ -12,6 +12,7 @@ import LeftImageArrow from "./LeftImageArrow";
 import RightImageArrow from "./RightImageArrow";
 
 gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(SplitText);
 
 const Hero = ({ heroData }: { heroData: any }) => {
   const { heroGallery, heroBackdrop } = heroData;
@@ -97,57 +98,76 @@ const Hero = ({ heroData }: { heroData: any }) => {
 
   // defualt animations for hero section
   useGSAP(() => {
-    console.log("heroTextContainerRef.current", heroTextContainerRef.current);
-    const heroH1 = heroTextContainerRef.current?.querySelector(
-      "h1"
-    ) as HTMLElement;
-    const heroP = heroTextContainerRef.current?.querySelector(
-      "p"
-    ) as HTMLElement;
+    gsap.set([".hero-title", ".hero-subtitle"], {
+      opacity: 1,
+    });
 
-    console.log("heroH1", heroH1);
-    console.log("heroP", heroP);
+    gsap.set(["#left-hero-arrow"], {
+      opacity: 0,
+      xPercent: -100,
+    });
 
-    const heroText = new SplitText(heroH1, {
+    gsap.set(["#right-hero-arrow"], {
+      opacity: 0,
+      xPercent: 100,
+    });
+
+    const heroText = new SplitText(".hero-title", {
       type: "lines",
     });
-    const heroSubText = new SplitText(heroP, {
+    const heroSubText = new SplitText(".hero-subtitle", {
       type: "lines",
     });
+
+    console.log("heroText", heroText);
+    console.log("heroSubText", heroSubText);
 
     const heroLines = heroText.lines;
     const heroSubLines = heroSubText.lines;
 
-    // initital anmation for hero text non scroll trigger
-
-    const initalTl = gsap.timeline({
-      delay: 0.05,
+    // Set initial state on the LINES (not parents)
+    gsap.set(heroLines, {
+      opacity: 0,
+      yPercent: -100, // Move THIS to the lines
     });
-    initalTl
-      .from(heroLines, {
-        opacity: 0,
-        yPercent: 100,
-        duration: 0.2,
+    gsap.set(heroSubLines, {
+      opacity: 0,
+      yPercent: -100, // Move THIS to the lines
+    });
+
+    const initialTl = gsap.timeline({
+      delay: 0.1,
+    });
+    initialTl
+      .to(heroLines, {
+        opacity: 1,
+        yPercent: 0,
+        duration: 0.3,
         stagger: 0.05,
-        delay: 0.2,
+        ease: "power2.out",
       })
-      .from(heroSubLines, {
-        opacity: 0,
-        yPercent: 100,
-        duration: 0.2,
-        stagger: 0.05,
-        delay: 0.2,
-      });
+      .to(
+        heroSubLines,
+        {
+          opacity: 1,
+          yPercent: 0,
+          duration: 0.3,
+          stagger: 0.05,
+          ease: "power2.out",
+        },
+        "-=0.2"
+      );
+
     gsap.from("#left-hero-arrow", {
       opacity: 0,
-      duration: 0.3,
-      delay: 1.2,
+      duration: 0.4,
+      delay: 1.3,
       xPercent: -100,
     });
     gsap.from("#right-hero-arrow", {
       opacity: 0,
-      duration: 0.3,
-      delay: 1.2,
+      duration: 0.4,
+      delay: 1.3,
       xPercent: 100,
     });
 
@@ -157,6 +177,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
         start: "top top",
         end: "bottom top",
         scrub: 1,
+        markers: true,
       },
     });
 
@@ -191,47 +212,47 @@ const Hero = ({ heroData }: { heroData: any }) => {
         "-=0.1"
       );
 
-    gsap.fromTo(
-      "#left-hero-arrow",
-      {
-        opacity: 1,
-        xPercent: 0,
-      },
-      {
-        scrollTrigger: {
-          trigger: "#hero-container",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          markers: true,
-        },
-        opacity: 0,
-        duration: 0.2,
-        ease: "power2.inOut",
-        xPercent: -100,
-      }
-    );
+    // gsap.fromTo(
+    //   "#left-hero-arrow",
+    //   {
+    //     opacity: 1,
+    //     xPercent: 0,
+    //   },
+    //   {
+    //     scrollTrigger: {
+    //       trigger: "#hero-container",
+    //       start: "top top",
+    //       end: "bottom top",
+    //       scrub: 1,
+    //       markers: true,
+    //     },
+    //     opacity: 0,
+    //     duration: 0.2,
+    //     ease: "power2.inOut",
+    //     xPercent: -100,
+    //   }
+    // );
 
-    gsap.fromTo(
-      "#right-hero-arrow",
-      {
-        opacity: 1,
-        xPercent: 0,
-      },
-      {
-        scrollTrigger: {
-          trigger: "#hero-container",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          markers: true,
-        },
-        opacity: 0,
-        duration: 0.2,
-        ease: "power2.inOut",
-        xPercent: 100,
-      }
-    );
+    // gsap.fromTo(
+    //   "#right-hero-arrow",
+    //   {
+    //     opacity: 1,
+    //     xPercent: 0,
+    //   },
+    //   {
+    //     scrollTrigger: {
+    //       trigger: "#hero-container",
+    //       start: "top top",
+    //       end: "bottom top",
+    //       scrub: 1,
+    //       markers: true,
+    //     },
+    //     opacity: 0,
+    //     duration: 0.2,
+    //     ease: "power2.inOut",
+    //     xPercent: 100,
+    //   }
+    // );
   }, []);
 
   const calculateImageIndex = (index: number) => {
@@ -257,11 +278,11 @@ const Hero = ({ heroData }: { heroData: any }) => {
               ref={heroTextContainerRef}
               className="flex flex-col gap-3 justify-center items-center p-10 bg-gray-800/40 rounded-xl"
             >
-              <h1 className="text-[28px] sm:text-[34px] md:text-[50px] font-montserrat font-bold text-white">
+              <h1 className="hero-title text-[28px] font-montserrat font-bold text-white">
                 Craftsmanship That{" "}
                 <span className="text-primary-400">Soars</span> Above the Rest
               </h1>
-              <p className="text-[16px] font-montserrat font-medium text-white">
+              <p className="hero-subtitle">
                 From concept to completion,{" "}
                 <span className="text-primary-400">Golden Eagle</span> delivers
                 exceptional craftsmanship that stands the test of time.
@@ -271,12 +292,12 @@ const Hero = ({ heroData }: { heroData: any }) => {
           <LeftImageArrow
             direction="left"
             onClick={() => handleArrowClick("left")}
-            position="top-[90%] left-[35%] z-10"
+            position="opacity-0 top-[90%] left-[35%] z-10"
           />
           <RightImageArrow
             direction="right"
             onClick={() => handleArrowClick("right")}
-            position="top-[90%] right-[35%] z-10"
+            position="opacity-0 top-[90%] right-[35%] z-10"
           />
         </div>
 
@@ -320,11 +341,11 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 ref={heroTextContainerRef}
                 className="flex flex-col h-full gap-3 flex-center p-10 rounded-xl text-start"
               >
-                <h1 className="text-[28px] md:text-[32px] lg:text-[36px] w-full xl:text-[50px] font-montserrat font-bold text-white">
+                <h1 className="hero-title">
                   Craftsmanship That{" "}
                   <span className="text-primary-400">Soars</span> Above the Rest
                 </h1>
-                <p className="text-[16px] w-full font-montserrat font-medium text-white">
+                <p className="hero-subtitle">
                   From concept to completion,{" "}
                   <span className="text-primary-400">Golden Eagle</span>{" "}
                   delivers exceptional craftsmanship that stands the test of
