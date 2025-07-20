@@ -17,7 +17,6 @@ gsap.registerPlugin(SplitText);
 const Hero = ({ heroData }: { heroData: any }) => {
   const { heroGallery, heroBackdrop } = heroData;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const heroTextContainerRef = useRef<HTMLDivElement>(null);
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
   const isAnimatingRef = useRef(false);
 
@@ -102,16 +101,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
       opacity: 1,
     });
 
-    gsap.set(["#left-hero-arrow"], {
-      opacity: 0,
-      xPercent: -100,
-    });
-
-    gsap.set(["#right-hero-arrow"], {
-      opacity: 0,
-      xPercent: 100,
-    });
-
     const heroText = new SplitText(".hero-title", {
       type: "lines",
     });
@@ -128,17 +117,51 @@ const Hero = ({ heroData }: { heroData: any }) => {
     // Set initial state on the LINES (not parents)
     gsap.set(heroLines, {
       opacity: 0,
-      yPercent: -100, // Move THIS to the lines
+      yPercent: -100,
     });
     gsap.set(heroSubLines, {
       opacity: 0,
-      yPercent: -100, // Move THIS to the lines
+      yPercent: -100,
     });
 
-    const initialTl = gsap.timeline({
-      delay: 0.1,
-    });
-    initialTl
+    // Initial animation timeline
+
+    const createScrollTriggers = () => {
+      if (scrollTriggersCreated) return;
+
+      scrollTriggersCreated = true;
+
+      const scrollTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#hero-text-container",
+          start: "top top",
+          end: "bottom 20%",
+          scrub: 1,
+          markers: true,
+        },
+      });
+
+      scrollTl
+        .to(heroLines, {
+          opacity: 0,
+          yPercent: -100,
+          stagger: 0.05,
+        })
+        .to(
+          heroSubLines,
+          {
+            opacity: 0,
+            yPercent: -100,
+            stagger: 0.05,
+          },
+          "-=0.1"
+        );
+    };
+    const masterTl = gsap.timeline({ onComplete: createScrollTriggers });
+
+    let scrollTriggersCreated = false;
+
+    masterTl
       .to(heroLines, {
         opacity: 1,
         yPercent: 0,
@@ -155,105 +178,73 @@ const Hero = ({ heroData }: { heroData: any }) => {
           stagger: 0.05,
           ease: "power2.out",
         },
-        "-=0.2"
-      );
-
-    gsap.from("#left-hero-arrow", {
-      opacity: 0,
-      duration: 0.4,
-      delay: 1.3,
-      xPercent: -100,
-    });
-    gsap.from("#right-hero-arrow", {
-      opacity: 0,
-      duration: 0.4,
-      delay: 1.3,
-      xPercent: 100,
-    });
-
-    const scrollTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroTextContainerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: 1,
-        markers: true,
-      },
-    });
-
-    scrollTl
-      .fromTo(
-        heroLines,
-        {
-          opacity: 1,
-          yPercent: 0,
-        },
-        {
-          opacity: 0,
-          yPercent: -100,
-          duration: 0.3,
-          ease: "power2.inOut",
-          stagger: 0.05,
-        }
-      )
-      .fromTo(
-        heroSubLines,
-        {
-          opacity: 1,
-          yPercent: 0,
-        },
-        {
-          opacity: 0,
-          yPercent: -100,
-          duration: 0.3,
-          ease: "power2.inOut",
-          stagger: 0.05,
-        },
         "-=0.1"
       );
 
-    // gsap.fromTo(
-    //   "#left-hero-arrow",
-    //   {
-    //     opacity: 1,
-    //     xPercent: 0,
-    //   },
-    //   {
-    //     scrollTrigger: {
-    //       trigger: "#hero-container",
-    //       start: "top top",
-    //       end: "bottom top",
-    //       scrub: 1,
-    //       markers: true,
-    //     },
-    //     opacity: 0,
-    //     duration: 0.2,
-    //     ease: "power2.inOut",
-    //     xPercent: -100,
-    //   }
-    // );
+    // // edge case for when user scrolls before initial animation completes
+    // ScrollTrigger.create({
+    //   trigger: "#hero-text-container",
+    //   start: "top top",
+    //   end: "bottom 20%",
+    //   onEnter: () => {
+    //     if (masterTl.progress() < 1) {
+    //       // User scrolled before initial completed
+    //       masterTl.kill(); // Kill initial animation
 
-    // gsap.fromTo(
-    //   "#right-hero-arrow",
-    //   {
-    //     opacity: 1,
-    //     xPercent: 0,
+    //       // Set completed state immediately
+    //       gsap.set(heroLines, { opacity: 1, yPercent: 0 });
+    //       gsap.set(heroSubLines, { opacity: 1, yPercent: 0 });
+
+    //       // Create scroll triggers now
+    //       createScrollTriggers();
+
+    //       // Force a small delay then refresh to apply current scroll position
+    //       gsap.delayedCall(0.01, () => {
+    //         ScrollTrigger.refresh();
+    //       });
+    //     }
     //   },
-    //   {
-    //     scrollTrigger: {
-    //       trigger: "#hero-container",
-    //       start: "top top",
-    //       end: "bottom top",
-    //       scrub: 1,
-    //       markers: true,
-    //     },
-    //     opacity: 0,
-    //     duration: 0.2,
-    //     ease: "power2.inOut",
-    //     xPercent: 100,
-    //   }
-    // );
-  }, []);
+    // });
+
+    // Arrow animations
+
+    let arrowScrollTriggersCreated = false;
+    const createArrowScrollTriggers = () => {
+      if (arrowScrollTriggersCreated) return;
+
+      arrowScrollTriggersCreated = true;
+
+      const arrowScrollTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#hero-container",
+          start: "top top",
+          end: "bottom 20%",
+          scrub: 1,
+          markers: true,
+        },
+      });
+
+      arrowScrollTl.to(["#left-hero-arrow", "#right-hero-arrow"], {
+        opacity: 0,
+        xPercent: (i) => (i === 0 ? -100 : 100),
+      });
+    };
+
+    gsap.set(["#left-hero-arrow", "#right-hero-arrow"], {
+      opacity: 0,
+      xPercent: (i) => (i === 0 ? -100 : 100),
+    });
+
+    // Initial arrow animation
+    gsap.to(["#left-hero-arrow", "#right-hero-arrow"], {
+      opacity: 1,
+      duration: 0.4,
+      delay: 1.3,
+      ease: "power2.inOut",
+      xPercent: 0,
+      onComplete: createArrowScrollTriggers,
+    });
+  }, []); // Correct scope placement
 
   const calculateImageIndex = (index: number) => {
     return (index + heroGallery.length) % heroGallery.length;
@@ -275,7 +266,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
           />
           <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col justify-center items-center">
             <div
-              ref={heroTextContainerRef}
+              id="hero-text-container"
               className="flex flex-col gap-3 justify-center items-center p-10 bg-gray-800/40 rounded-xl"
             >
               <h1 className="hero-title text-[28px] font-montserrat font-bold text-white">
@@ -337,10 +328,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
               className="object-cover object-top opacity-30"
             />
             <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col flex-center">
-              <div
-                ref={heroTextContainerRef}
-                className="flex flex-col h-full gap-3 flex-center p-10 rounded-xl text-start"
-              >
+              <div className="flex flex-col h-full gap-3 flex-center p-10 rounded-xl text-start">
                 <h1 className="hero-title">
                   Craftsmanship That{" "}
                   <span className="text-primary-400">Soars</span> Above the Rest
