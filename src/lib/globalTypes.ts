@@ -24,6 +24,20 @@ export type HeroImage = {
 }
 
 export type AboutData = {
-  aboutGallery: string[];
-  aboutBackdrop: string;
+  aboutGallery: {
+    id: number;
+    url: string;
+    alt: string;
+    s3Key: string;
+    isBackdrop: boolean;
+    category: string;
+  }[];
+  aboutBackdrop: {
+    id: number;
+    url: string;
+    alt: string;
+    s3Key: string;
+    isBackdrop: boolean;
+    category: string;
+  };
 }

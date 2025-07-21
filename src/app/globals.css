@@ -92,3 +92,11 @@ body {
 @utility hero-text-hidden {
   @apply hidden transform -translate-y-full;
 }
+
+@utility text-card-title {
+  @apply font-montserrat w-full font-bold italic text-[30px] lg:text-[40px] xl:text-[50px];
+}
+
+@utility text-card-description {
+  @apply font-montserrat text-[16px] lg:text-[18px];
+}

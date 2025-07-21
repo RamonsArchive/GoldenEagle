@@ -8,14 +8,15 @@ const Home = async () => {
   console.log(userId);
 
   const heroData = await fetchHeroData();
+  console.log("This is the hero data", heroData);
   const aboutData = await fetchAboutData();
-  console.log(heroData);
+  console.log(aboutData);
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh+(30rem))]">
+    <>
       <Hero heroData={heroData.data} />
       <About aboutData={aboutData.data} />
-    </div>
+    </>
   );
 };
 

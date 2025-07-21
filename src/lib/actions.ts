@@ -363,8 +363,12 @@ export const fetchAboutData = async () => {
         s3Key: true,
         isBackdrop: true,
         category: true,
+        width: true,
+        height: true,
       }
     })
+
+    console.log("This is the about gallery", aboutGallery);
 
     if (!aboutGallery) {
       return parseServerActionResponse({
@@ -387,6 +391,8 @@ export const fetchAboutData = async () => {
         category: true,
       }
     })
+
+    console.log("This is the about backdrop", aboutBackdrop);
 
     if (!aboutBackdrop) {
       return parseServerActionResponse({
