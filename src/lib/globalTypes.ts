@@ -22,3 +22,8 @@ export type HeroImage = {
   id: number;
   url: string;
 }
+
+export type AboutData = {
+  aboutGallery: string[];
+  aboutBackdrop: string;
+}

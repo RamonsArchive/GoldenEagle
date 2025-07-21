@@ -24,3 +24,13 @@ export const heroImages =
             "gallery/1752874302743-homeRemodelImage1.jpg",
         ]
     }
+
+export const aboutImages = {
+    // 1753080898353-516346817_1105110334827784_7592258741190857465_n
+    backdrops: [
+        "backdrops/1752873840601-paint2.jpg",
+    ],
+    gallery: [
+        "gallery/1753080898353-516346817_1105110334827784_7592258741190857465_n.jpg"
+    ]
+}

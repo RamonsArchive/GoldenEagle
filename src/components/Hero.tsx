@@ -20,8 +20,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
   const isAnimatingRef = useRef(false);
 
-  console.log(heroData);
-
   useEffect(() => {
     const startAutoRotation = () => {
       if (autoRotateRef.current) {
@@ -108,9 +106,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
       type: "lines",
     });
 
-    console.log("heroText", heroText);
-    console.log("heroSubText", heroSubText);
-
     const heroLines = heroText.lines;
     const heroSubLines = heroSubText.lines;
 
@@ -188,15 +183,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
 
     const leftArrows = document.querySelectorAll("#left-hero-arrow");
     const rightArrows = document.querySelectorAll("#right-hero-arrow");
-
-    console.log("Left arrows found:", leftArrows.length);
-    console.log("Right arrows found:", rightArrows.length);
-
-    leftArrows.forEach((arrow, i) => {
-      const computedStyle = window.getComputedStyle(arrow);
-      console.log(`Left arrow ${i} display:`, computedStyle.display);
-      console.log(`Left arrow ${i} visibility:`, computedStyle.visibility);
-    });
 
     let arrowScrollTriggersCreated = false;
     const arrows = isMobile

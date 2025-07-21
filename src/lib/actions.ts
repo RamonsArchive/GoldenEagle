@@ -5,16 +5,14 @@ import { prisma } from './prisma';
 import { s3Client } from './s3';
 import { revalidatePath } from 'next/cache';
 import { Project_Type } from './globalTypes';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { parseServerActionResponse } from './utils';
 import { glob } from 'glob';
 import fs from 'fs';
 import path from 'path';
 import { useRateLimiter } from './rateLimiter';
 import { cookies } from "next/headers";
-import { heroImages } from '@/constants';
+import { heroImages, aboutImages } from '@/constants';
 
 export async function uploadImagesToS3(formData: FormData) {
   try {
@@ -280,6 +278,12 @@ export const getUserId = async () => {
 
 export const fetchHeroData = async () => {
   try {
+
+    const isRateLimited = await useRateLimiter("fetchHeroData");
+    if (isRateLimited.status === "ERROR") {
+      return isRateLimited;
+    }
+
     const heorGallery = await prisma.image.findMany({
       where: {
         s3Key: {
@@ -326,8 +330,10 @@ export const fetchHeroData = async () => {
     return parseServerActionResponse({
       status: "SUCCESS",
       error: "",
-      heroGallery: heorGallery,
-      heroBackdrop: heroBackdrop
+      data: {
+        heroGallery: heorGallery,
+        heroBackdrop: heroBackdrop,
+      }
     })
   } catch (error) {
     console.error("Error fetching hero data", error);
@@ -336,5 +342,73 @@ export const fetchHeroData = async () => {
       error: "Failed to fetch hero data"
     });
   }
-  
+}
+
+export const fetchAboutData = async () => {
+  try {
+    const isRateLimited = await useRateLimiter("fetchAboutData");
+    if (isRateLimited.status === "ERROR") {
+      return isRateLimited;
+    }
+
+    const aboutGallery = await prisma.image.findMany({
+      where: {
+        s3Key: {
+          in: aboutImages.gallery
+        }
+      },
+      select: {
+        url: true,
+        alt: true,
+        s3Key: true,
+        isBackdrop: true,
+        category: true,
+      }
+    })
+
+    if (!aboutGallery) {
+      return parseServerActionResponse({
+        status: "ERROR",
+        error: "No about gallery images found"
+      });
+    }
+
+    const aboutBackdrop = await prisma.image.findFirst({
+      where: {
+        s3Key: {
+          in: aboutImages.backdrops
+        }
+      },
+      select: {
+        url: true,
+        alt: true,
+        s3Key: true,
+        isBackdrop: true,
+        category: true,
+      }
+    })
+
+    if (!aboutBackdrop) {
+      return parseServerActionResponse({
+        status: "ERROR",
+        error: "No about backdrop image found"
+      });
+    }
+
+    return parseServerActionResponse({
+      status: "SUCCESS",
+      error: "",
+      data: {
+        aboutGallery: aboutGallery,
+        aboutBackdrop: aboutBackdrop
+      }
+    })
+
+  } catch (error) {
+    console.error("Error fetching about data", error);
+    return parseServerActionResponse({
+      status: "ERROR",
+      error: "Failed to fetch about data"
+    });
+  }
 }
