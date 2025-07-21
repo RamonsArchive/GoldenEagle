@@ -124,16 +124,21 @@ const Hero = ({ heroData }: { heroData: any }) => {
       yPercent: -100,
     });
 
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+
     // Initial animation timeline
 
     const createScrollTriggers = () => {
       if (scrollTriggersCreated) return;
-
       scrollTriggersCreated = true;
+
+      const triggerElement = isMobile
+        ? "#hero-text-container-mobile"
+        : "#hero-text-container-desktop";
 
       const scrollTl = gsap.timeline({
         scrollTrigger: {
-          trigger: "#hero-text-container",
+          trigger: triggerElement,
           start: "top top",
           end: "bottom 20%",
           scrub: 1,
@@ -181,34 +186,22 @@ const Hero = ({ heroData }: { heroData: any }) => {
         "-=0.1"
       );
 
-    // // edge case for when user scrolls before initial animation completes
-    // ScrollTrigger.create({
-    //   trigger: "#hero-text-container",
-    //   start: "top top",
-    //   end: "bottom 20%",
-    //   onEnter: () => {
-    //     if (masterTl.progress() < 1) {
-    //       // User scrolled before initial completed
-    //       masterTl.kill(); // Kill initial animation
+    const leftArrows = document.querySelectorAll("#left-hero-arrow");
+    const rightArrows = document.querySelectorAll("#right-hero-arrow");
 
-    //       // Set completed state immediately
-    //       gsap.set(heroLines, { opacity: 1, yPercent: 0 });
-    //       gsap.set(heroSubLines, { opacity: 1, yPercent: 0 });
+    console.log("Left arrows found:", leftArrows.length);
+    console.log("Right arrows found:", rightArrows.length);
 
-    //       // Create scroll triggers now
-    //       createScrollTriggers();
-
-    //       // Force a small delay then refresh to apply current scroll position
-    //       gsap.delayedCall(0.01, () => {
-    //         ScrollTrigger.refresh();
-    //       });
-    //     }
-    //   },
-    // });
-
-    // Arrow animations
+    leftArrows.forEach((arrow, i) => {
+      const computedStyle = window.getComputedStyle(arrow);
+      console.log(`Left arrow ${i} display:`, computedStyle.display);
+      console.log(`Left arrow ${i} visibility:`, computedStyle.visibility);
+    });
 
     let arrowScrollTriggersCreated = false;
+    const arrows = isMobile
+      ? ["#left-hero-arrow-mobile", "#right-hero-arrow-mobile"]
+      : ["#left-hero-arrow-desktop", "#right-hero-arrow-desktop"];
     const createArrowScrollTriggers = () => {
       if (arrowScrollTriggersCreated) return;
 
@@ -224,19 +217,19 @@ const Hero = ({ heroData }: { heroData: any }) => {
         },
       });
 
-      arrowScrollTl.to(["#left-hero-arrow", "#right-hero-arrow"], {
+      arrowScrollTl.to(arrows, {
         opacity: 0,
         xPercent: (i) => (i === 0 ? -100 : 100),
       });
     };
 
-    gsap.set(["#left-hero-arrow", "#right-hero-arrow"], {
+    gsap.set(arrows, {
       opacity: 0,
       xPercent: (i) => (i === 0 ? -100 : 100),
     });
 
     // Initial arrow animation
-    gsap.to(["#left-hero-arrow", "#right-hero-arrow"], {
+    gsap.to(arrows, {
       opacity: 1,
       duration: 0.4,
       delay: 1.3,
@@ -266,10 +259,10 @@ const Hero = ({ heroData }: { heroData: any }) => {
           />
           <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col justify-center items-center">
             <div
-              id="hero-text-container"
+              id="hero-text-container-mobile"
               className="flex flex-col gap-3 justify-center items-center p-10 bg-gray-800/40 rounded-xl"
             >
-              <h1 className="hero-title text-[28px] font-montserrat font-bold text-white">
+              <h1 className="hero-title">
                 Craftsmanship That{" "}
                 <span className="text-primary-400">Soars</span> Above the Rest
               </h1>
@@ -281,11 +274,13 @@ const Hero = ({ heroData }: { heroData: any }) => {
             </div>
           </div>
           <LeftImageArrow
+            id="left-hero-arrow-mobile"
             direction="left"
             onClick={() => handleArrowClick("left")}
             position="opacity-0 top-[90%] left-[35%] z-10"
           />
           <RightImageArrow
+            id="right-hero-arrow-mobile"
             direction="right"
             onClick={() => handleArrowClick("right")}
             position="opacity-0 top-[90%] right-[35%] z-10"
@@ -328,7 +323,10 @@ const Hero = ({ heroData }: { heroData: any }) => {
               className="object-cover object-top opacity-30"
             />
             <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col flex-center">
-              <div className="flex flex-col h-full gap-3 flex-center p-10 rounded-xl text-start">
+              <div
+                id="hero-text-container-desktop"
+                className="flex flex-col h-full gap-3 flex-center p-10 rounded-xl text-start"
+              >
                 <h1 className="hero-title">
                   Craftsmanship That{" "}
                   <span className="text-primary-400">Soars</span> Above the Rest
@@ -377,11 +375,13 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 className="hero-image"
               />
               <LeftImageArrow
+                id="left-hero-arrow-desktop"
                 direction="left"
                 onClick={() => handleArrowClick("left")}
                 position="top-[50%] left-[5%] z-10"
               />
               <RightImageArrow
+                id="right-hero-arrow-desktop"
                 direction="right"
                 onClick={() => handleArrowClick("right")}
                 position="top-[50%] right-[5%] z-10"

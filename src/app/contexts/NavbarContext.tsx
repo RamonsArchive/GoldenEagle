@@ -32,7 +32,6 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
     setScreenWidth(window.innerWidth);
 
     const handleResize = () => {
-      console.log("resizing to", window.innerWidth);
       setScreenWidth(window.innerWidth);
     };
 
