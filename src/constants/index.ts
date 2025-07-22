@@ -31,6 +31,8 @@ export const aboutImages = {
         "backdrops/1752873840601-paint2.jpg",
     ],
     gallery: [
-        "gallery/1753080898353-516346817_1105110334827784_7592258741190857465_n.jpg"
+        "gallery/1753080898353-516346817_1105110334827784_7592258741190857465_n.jpg",
+        "gallery/1753150006314-concreteImage6.jpg",
+        "gallery/1753149996676-concreteImage8.jpg",
     ]
 }

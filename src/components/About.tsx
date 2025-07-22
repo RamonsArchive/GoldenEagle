@@ -3,6 +3,13 @@ import React, { useEffect, useState } from "react";
 import { AboutData } from "@/lib/globalTypes";
 import Image from "next/image";
 import TextCard from "./TextCard";
+import BeforeAfterCard from "./BeforeAfterCard";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitText from "gsap/SplitText";
+
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const About = ({ aboutData }: { aboutData: AboutData }) => {
   console.log(aboutData);
@@ -20,8 +27,10 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
     }
   }, [aboutGallery]);
 
+  useGSAP(() => {}, []);
+
   return (
-    <div className="relative flex flex-col md:flex-row w-full h-[calc(150vh+10rem)] pt-10">
+    <main className="relative flex flex-col md:flex-row w-full min-h-screen py-15">
       <Image
         src={aboutBackdrop.url}
         alt="about backdrop"
@@ -48,11 +57,16 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
             titleStyle="text-card-title"
             descriptionStyle="text-card-description"
           />
-          <div className="flex flex-col flex-center w-full p-5 xs:pb-10 xs:pt-5 xs:px-5 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
+          <div className="flex flex-col flex-center w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
             <h1 className="text-card-title">
               Meet the <span className="text-primary-400">Aguilar's</span>
             </h1>
-            <div className="relative flex flex-center w-full h-[240px] xs:h-[300px] sm:h-[400px]">
+            <div
+              className="relative flex flex-center w-full"
+              style={{
+                aspectRatio: imageAspectRatio ? imageAspectRatio : "4/3",
+              }}
+            >
               <Image
                 src={aboutGallery[0].url}
                 alt="about gallery"
@@ -172,27 +186,33 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
           />
         </div>
       </div>
-      <div className="flex flex-1 items-start p-10">
-        <div className="flex flex-col w-full p-10 gap-5 bg-slate-900/60 rounded-xl shadow-lg z-10">
+      <div className="hidden md:flex flex-1 flex-col gap-10 items-start p-10">
+        <div className="flex flex-col w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
           <h1 className="text-card-title">
             Meet the <span className="text-primary-400">Aguilar's</span>
           </h1>
           <div
             className="relative flex w-full"
             style={{
-              aspectRatio: imageAspectRatio ? imageAspectRatio : undefined,
+              aspectRatio: imageAspectRatio ? imageAspectRatio : "4/3",
             }}
           >
             <Image
               src={aboutGallery[0].url}
               alt="about gallery"
               fill
-              className="object-contain object-top"
+              className="object-contain object-top rounded-xl shadow-lg"
             />
           </div>
         </div>
+        <BeforeAfterCard
+          id="before-after-card"
+          beforeImage={aboutGallery[2].url}
+          afterImage={aboutGallery[1].url}
+          imageStyles="h-[300px] lg:h-[400px] w-full rounded-xl shadow-lg"
+        />
       </div>
-    </div>
+    </main>
   );
 };
 
