@@ -61,7 +61,7 @@ const Navbar = () => {
     }
 
     // Create and animate
-    splitTextRefs.current.default = SplitText.create(navElements, {
+    splitTextRefs.current.default = SplitText.create(Array.from(navElements), {
       type: "lines",
     });
 
@@ -93,7 +93,7 @@ const Navbar = () => {
       }
 
       // Create and animate
-      splitTextRefs.current.scroll = SplitText.create(navElements, {
+      splitTextRefs.current.scroll = SplitText.create(Array.from(navElements), {
         type: "lines",
       });
 

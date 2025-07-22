@@ -137,7 +137,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
           start: "top top",
           end: "bottom 20%",
           scrub: 1,
-          markers: true,
         },
       });
 
@@ -199,7 +198,6 @@ const Hero = ({ heroData }: { heroData: any }) => {
           start: "top top",
           end: "bottom 20%",
           scrub: 1,
-          markers: true,
         },
       });
 

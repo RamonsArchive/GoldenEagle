@@ -14,15 +14,15 @@ const BeforeAfterCard = ({
   imageStyles: string;
 }) => {
   return (
-    <div
-      id={id}
-      className="flex flex-row w-full p-10 gap-5 bg-slate-900/70 rounded-xl shadow-lg"
-    >
+    <div id={id} className="before-after-card">
       <div className="flex flex-col w-[50%] gap-5">
         <div className="flex flex-center flex-col w-full">
           <h1 className="text-card-title text-center">Before</h1>
         </div>
-        <div className={`relative flex w-full ${imageStyles}`}>
+        <div
+          id="before-image"
+          className={`relative flex w-full ${imageStyles}`}
+        >
           <Image
             src={beforeImage}
             alt="before"
@@ -35,7 +35,7 @@ const BeforeAfterCard = ({
         <div className="flex flex-center flex-col w-full">
           <h1 className="text-card-title text-center">After</h1>
         </div>
-        <div className={`relative flex w-full ${imageStyles}`}>
+        <div id="after-image" className={`relative flex w-full ${imageStyles}`}>
           <Image
             src={afterImage}
             alt="after"
