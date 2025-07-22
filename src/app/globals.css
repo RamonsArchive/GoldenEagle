@@ -112,3 +112,7 @@ body {
 @utility before-after-card {
   @apply flex flex-row w-full p-10 gap-5 bg-slate-900/70 rounded-xl shadow-lg opacity-0;
 }
+
+@utility before-after-card-mobile {
+  @apply flex flex-col w-full p-10 gap-5 bg-slate-900/70 rounded-xl shadow-lg z-10 opacity-0;
+}

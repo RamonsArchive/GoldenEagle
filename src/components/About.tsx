@@ -30,7 +30,11 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
     // 1. INITIAL SETUP - Set cards to invisible and offset
 
     const isMobile = window.innerWidth < 768;
-    gsap.set([".text-card", ".image-card", ".before-after-card"], {
+    const beforeAfterCardSection = isMobile
+      ? document.querySelector(".before-after-card-mobile")
+      : document.querySelector(".before-after-card");
+
+    gsap.set([".text-card", ".image-card", beforeAfterCardSection], {
       opacity: 0,
       y: 50, // Use 'y' instead of 'yPercent'
     });
@@ -71,7 +75,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
     });
 
     // 3. ANIMATE CARDS WITH SCROLL-CONTROLLED SCRUB
-    ScrollTrigger.batch([".text-card", ".image-card", ".before-after-card"], {
+    ScrollTrigger.batch([".text-card", ".image-card", beforeAfterCardSection], {
       onEnter: (elements) => {
         elements.forEach((element, index) => {
           gsap.to(element, {
@@ -229,63 +233,60 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
     });
 
     // 6. SPECIAL HANDLING FOR BEFORE-AFTER CARD
-    if (!isMobile) {
-      const beforeAfterCard = document.querySelector(".before-after-card");
-      console.log("found before after card", beforeAfterCard);
-      if (beforeAfterCard) {
-        const titles = beforeAfterCard.querySelectorAll(".text-card-title");
-        const beforeImage = beforeAfterCard.querySelector("#before-image");
-        const afterImage = beforeAfterCard.querySelector("#after-image");
-        console.log("found before image", beforeImage);
-        console.log("found after image", afterImage);
-        console.log("found titles", titles);
+    if (beforeAfterCardSection) {
+      const titles =
+        beforeAfterCardSection.querySelectorAll(".text-card-title");
+      const beforeImage = beforeAfterCardSection.querySelector("#before-image");
+      const afterImage = beforeAfterCardSection.querySelector("#after-image");
+      console.log("found before image", beforeImage);
+      console.log("found after image", afterImage);
+      console.log("found titles", titles);
 
-        const splitTitles: SplitText[] = [];
-        titleElements.forEach((titleEl, index) => {
-          if (Array.from(titles).includes(titleEl)) {
-            splitTitles.push(titleSplits[index]);
-          }
-        });
-        console.log("split titles", splitTitles);
-
-        if (splitTitles.length > 0) {
-          const beforeAfterTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: beforeAfterCard,
-              start: "top 85%",
-              end: "top 55%",
-              scrub: 1,
-              toggleActions: "play none none reverse",
-            },
-          });
-
-          splitTitles.forEach((split) => {
-            beforeAfterTl.fromTo(
-              (split as SplitText).words,
-              { opacity: 0, y: 30 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                stagger: 0.05,
-                ease: "power2.out",
-              }
-            );
-          });
-
-          beforeAfterTl.fromTo(
-            beforeImage,
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
-          );
-
-          beforeAfterTl.fromTo(
-            afterImage,
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-            "-=0.3"
-          );
+      const splitTitles: SplitText[] = [];
+      titleElements.forEach((titleEl, index) => {
+        if (Array.from(titles).includes(titleEl)) {
+          splitTitles.push(titleSplits[index]);
         }
+      });
+      console.log("split titles", splitTitles);
+
+      if (splitTitles.length > 0) {
+        const beforeAfterTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: beforeAfterCardSection,
+            start: "top 85%",
+            end: "top 55%",
+            scrub: 1,
+            toggleActions: "play none none reverse",
+          },
+        });
+
+        splitTitles.forEach((split) => {
+          beforeAfterTl.fromTo(
+            (split as SplitText).words,
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              stagger: 0.05,
+              ease: "power2.out",
+            }
+          );
+        });
+
+        beforeAfterTl.fromTo(
+          beforeImage,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+        );
+
+        beforeAfterTl.fromTo(
+          afterImage,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+          "-=0.3"
+        );
       }
     }
 
@@ -347,6 +348,14 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
               />
             </div>
           </div>
+
+          <BeforeAfterCard
+            id="before-after-card-mobile"
+            beforeImage={aboutGallery[2].url}
+            afterImage={aboutGallery[1].url}
+            imageStyles="h-[250px] sm:h-[300px] w-full rounded-xl shadow-lg"
+            isMobile={true}
+          />
 
           <TextCard
             id="experience-location-mobile"
