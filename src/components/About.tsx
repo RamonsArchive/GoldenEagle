@@ -298,12 +298,13 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
 
   return (
     <main
-      id="about-container"
+      id="about"
       className="relative flex flex-col md:flex-row w-full min-h-screen py-15"
     >
       <Image
         src={aboutBackdrop.url}
         alt="about backdrop"
+        sizes="100vw"
         fill
         className="object-cover object-top opacity-10"
       />
@@ -343,8 +344,9 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
               <Image
                 src={aboutGallery[0].url}
                 alt="about gallery"
-                fill
-                className="object-contain object-top"
+                width={500}
+                height={400}
+                className="object-contain object-top rounded-xl shadow-lg"
               />
             </div>
           </div>
@@ -485,7 +487,8 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
             <Image
               src={aboutGallery[0].url}
               alt="about gallery"
-              fill
+              width={1000}
+              height={800}
               className="object-contain object-top rounded-xl shadow-lg"
             />
           </div>

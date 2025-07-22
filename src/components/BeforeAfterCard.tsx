@@ -29,6 +29,7 @@ const BeforeAfterCard = ({
             <Image
               src={beforeImage}
               alt="before"
+              sizes={`${isMobile ? "70vw" : "50vw"}`}
               fill
               className="object-cover object-top rounded-xl shadow-lg"
             />
@@ -45,6 +46,7 @@ const BeforeAfterCard = ({
             <Image
               src={afterImage}
               alt="after"
+              sizes={`${isMobile ? "70vw" : "50vw"}`}
               fill
               className="object-cover object-top rounded-xl shadow-lg"
             />
@@ -60,6 +62,7 @@ const BeforeAfterCard = ({
             <Image
               src={beforeImage}
               alt="before"
+              sizes={`${isMobile ? "70vw" : "50vw"}`}
               fill
               className="object-cover object-top rounded-xl shadow-lg"
             />
@@ -92,6 +95,7 @@ const BeforeAfterCard = ({
             <Image
               src={afterImage}
               alt="after"
+              sizes={`${isMobile ? "70vw" : "50vw"}`}
               fill
               className="object-cover object-top rounded-xl shadow-lg"
             />

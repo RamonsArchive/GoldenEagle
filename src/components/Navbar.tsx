@@ -10,7 +10,7 @@ import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
 
 const Navbar = () => {
-  const { isMobile, navLinks } = useNavbar();
+  const { isMobile, navLinks, scrollToSection } = useNavbar();
   const [isScrolled, setIsScrolled] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -126,7 +126,11 @@ const Navbar = () => {
   const renderNavLinks = (ref: React.RefObject<HTMLDivElement>) => (
     <div ref={ref} className="flex items-center gap-3 md:gap-8 flex-row">
       {navLinks.map((link: NavLinkType) => (
-        <p className="nav-link" key={link.id}>
+        <p
+          className="nav-link"
+          key={link.id}
+          onClick={() => scrollToSection(link.id)}
+        >
           {link.title}
         </p>
       ))}

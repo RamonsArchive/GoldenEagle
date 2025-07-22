@@ -44,6 +44,13 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
   // Smooth scroll to section function
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
+    if (sectionId === "hero") {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      return;
+    }
     if (element) {
       element.scrollIntoView({
         behavior: "smooth",

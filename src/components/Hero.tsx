@@ -194,7 +194,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
 
       const arrowScrollTl = gsap.timeline({
         scrollTrigger: {
-          trigger: "#hero-container",
+          trigger: "#hero",
           start: "top top",
           end: "bottom 20%",
           scrub: 1,
@@ -228,17 +228,15 @@ const Hero = ({ heroData }: { heroData: any }) => {
   };
 
   return (
-    <div
-      id="hero-container"
-      className="flex flex-col w-full h-[calc(100vh-(3.25rem))]"
-    >
+    <div id="hero" className="flex flex-col w-full h-[calc(100vh-(3.25rem))]">
       <div className="flex flex-col w-full h-full sm:hidden ">
-        <div className="relative flex w-full h-[60%] overflow-hidden">
+        <div className="relative flex w-full h-[60%] aspect-[4/3] overflow-hidden">
           {/* main image with text */}
           <Image
             src={heroGallery[calculateImageIndex(currentImageIndex)].url}
             alt={`Hero Image ${currentImageIndex}`}
-            fill
+            width={800}
+            height={600}
             className="hero-image"
           />
           <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col justify-center items-center">
@@ -279,6 +277,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                   heroGallery[calculateImageIndex(currentImageIndex + 1)].url
                 }
                 alt={`Hero Image ${currentImageIndex + 1}`}
+                sizes="50vw"
                 fill
                 className="hero-image"
               />
@@ -289,6 +288,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                   heroGallery[calculateImageIndex(currentImageIndex + 2)].url
                 }
                 alt={`Hero Image ${currentImageIndex + 2}`}
+                sizes="50vw"
                 fill
                 className="hero-image"
               />
@@ -303,6 +303,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
             <Image
               src={heroBackdrop.url}
               alt={heroBackdrop.alt}
+              sizes="50vw"
               fill
               className="object-cover object-top opacity-30"
             />
@@ -332,6 +333,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                     heroGallery[calculateImageIndex(currentImageIndex + 1)].url
                   }
                   alt={`Hero Image ${currentImageIndex + 1}`}
+                  sizes="25vw"
                   fill
                   className="hero-image"
                 />
@@ -342,6 +344,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                     heroGallery[calculateImageIndex(currentImageIndex + 2)].url
                   }
                   alt={`Hero Image ${currentImageIndex + 2}`}
+                  sizes="25vw"
                   fill
                   className="hero-image"
                 />
@@ -355,6 +358,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
               <Image
                 src={heroGallery[calculateImageIndex(currentImageIndex)].url}
                 alt={`Hero Image ${currentImageIndex}`}
+                sizes="50vw"
                 fill
                 className="hero-image"
               />
