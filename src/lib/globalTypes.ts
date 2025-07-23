@@ -12,6 +12,19 @@ export const Project_Type = {
     OTHER: "OTHER",
   } as const;
 
+export const Services_Type = {
+  CUSTOM_HOME: "CUSTOM_HOME",
+  BATHROOM_REMODEL: "BATHROOM_REMODEL",
+  KITCHEN_REMODEL: "KITCHEN_REMODEL",
+  FENCES: "FENCES",
+  PATIO: "PATIO",
+  FLOORING: "FLOORING",
+  CONCRETE: "CONCRETE",
+  PAINTING: "PAINTING",
+  ROOFING: "ROOFING",
+  WINDOWS: "WINDOWS",
+} as const;
+
 
 export type NavLinkType = {
   id: string;
@@ -40,4 +53,24 @@ export type AboutData = {
     isBackdrop: boolean;
     category: string;
   };
+}
+
+export type ServicesData = {
+  servicesBackdrop: {
+    id: number;
+    url: string;
+    alt: string;
+    s3Key: string;
+    isBackdrop: boolean;
+    category: string;
+  };
+  awsServicesImages: Record<string, string[]>;
+}
+
+export type ServiceImageType = {
+  url: string;
+  alt: string | null;
+  s3Key: string;
+  isBackdrop: boolean;
+  category: string;
 }

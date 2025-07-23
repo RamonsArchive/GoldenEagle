@@ -4,7 +4,7 @@
 import { prisma } from './prisma';
 import { s3Client } from './s3';
 import { revalidatePath } from 'next/cache';
-import { Project_Type } from './globalTypes';
+import { Project_Type, ServiceImageType, Services_Type } from './globalTypes';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { parseServerActionResponse } from './utils';
 import { glob } from 'glob';
@@ -12,7 +12,7 @@ import fs from 'fs';
 import path from 'path';
 import { useRateLimiter } from './rateLimiter';
 import { cookies } from "next/headers";
-import { heroImages, aboutImages } from '@/constants';
+import { heroImages, aboutImages, servicesImages } from '@/constants';
 
 export async function uploadImagesToS3(formData: FormData) {
   try {
@@ -418,3 +418,70 @@ export const fetchAboutData = async () => {
     });
   }
 }
+// Alternative: Even more optimized with parallel queries
+export const fetchServicesData = async () => {
+  try {
+    const isRateLimited = await useRateLimiter("fetchServicesData");
+    if (isRateLimited.status === "ERROR") {
+      return isRateLimited;
+    }
+
+    // Execute queries in parallel
+    const [servicesBackdrop, allProjectImages] = await Promise.all([
+      prisma.image.findFirst({
+        where: { s3Key: { in: servicesImages.backdrops } }
+      }),
+      prisma.image.findMany({
+        where: { category: { in: servicesImages.projectTypes as (keyof typeof Services_Type)[] } },
+        select: {
+          url: true,
+          alt: true,
+          s3Key: true,
+          isBackdrop: true,
+          category: true,
+        }
+      })
+    ]);
+
+    if (!servicesBackdrop) {
+      return parseServerActionResponse({
+        status: "ERROR",
+        error: "No services backdrop image found"
+      });
+    }
+
+    const awsServicesImages = servicesImages.projectTypes.reduce(
+      (acc, projectType) => {
+        acc[projectType] = allProjectImages
+          .filter(image => image.category === projectType)
+          .map(image => {
+            return {
+              url: image.url,
+              alt: image.alt,
+              s3Key: image.s3Key,
+              isBackdrop: image.isBackdrop,
+              category: image.category,
+            }
+          });
+        return acc;
+      }, 
+      {} as Record<string, ServiceImageType[]>
+    );
+
+    return parseServerActionResponse({
+      status: "SUCCESS",
+      error: "",
+      data: {
+        servicesBackdrop,
+        awsServicesImages
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching services data", error);
+    return parseServerActionResponse({
+      status: "ERROR",
+      error: "Failed to fetch services data"
+    });
+  }
+};

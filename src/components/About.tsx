@@ -238,9 +238,6 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
         beforeAfterCardSection.querySelectorAll(".text-card-title");
       const beforeImage = beforeAfterCardSection.querySelector("#before-image");
       const afterImage = beforeAfterCardSection.querySelector("#after-image");
-      console.log("found before image", beforeImage);
-      console.log("found after image", afterImage);
-      console.log("found titles", titles);
 
       const splitTitles: SplitText[] = [];
       titleElements.forEach((titleEl, index) => {
@@ -248,7 +245,6 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
           splitTitles.push(titleSplits[index]);
         }
       });
-      console.log("split titles", splitTitles);
 
       if (splitTitles.length > 0) {
         const beforeAfterTl = gsap.timeline({

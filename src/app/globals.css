@@ -5,6 +5,17 @@
   --foreground: #FFFFFF;
 }
 
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: none;         /* “none” hides it in Firefox */
+  -ms-overflow-style: none;
+}
+
+/* 2. For WebKit browsers (Chrome, Safari, Opera) */
+body::-webkit-scrollbar {
+  display: none;                 /* literally remove it */
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

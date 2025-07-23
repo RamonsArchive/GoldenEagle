@@ -64,10 +64,10 @@ export default function ImageUploadForm() {
         // "public/assets/KitchenRemodel/**/*.jpg",
         //"public/assets/Patio/**/*.jpg",
         //"public/assets/Painting/**/*.jpg",
-        //"public/assets/Roofing/**/*.jpg",
+        "public/assets/Roofing/**/*.jpg",
         //"public/assets/Windows/**/*.jpg",
         // "public/assets/Other/**/*.jpg",
-        "public/assets/Concrete/**/*.jpg", // custom home images
+        //"public/assets/Concrete/**/*.jpg", // custom home images
         //"public/assets/Backdrops/**/*",
       ];
 

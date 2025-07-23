@@ -21,7 +21,7 @@ QUALITY=85
 converted_count=0
 
 # Define the target directory
-TARGET_DIR="public/assets/Concrete"
+TARGET_DIR="public/assets/Windows"
 
 # Check if the target directory exists
 if [ ! -d "$TARGET_DIR" ]; then
