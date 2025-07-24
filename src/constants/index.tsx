@@ -1,3 +1,4 @@
+import { ServiceDescriptionsType } from "@/lib/globalTypes";
 import { AnyARecord } from "dns";
 
 export const navLinks = [
@@ -44,16 +45,13 @@ export const servicesImages = {
   ],
 };
 
-export const serviceDescriptions = new Map<string, any>([
+export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
   [
     "CUSTOM_HOME",
     {
       title: "Custom Home",
       description: <>Where dreams take shape. Your sanctuary, built to last.</>,
       subDescription: (
-        <>From the ground up, we create a space that is truly yours.</>
-      ),
-      image: (
         <>
           From concept to keys, we craft homes that tell your story with every
           detail.

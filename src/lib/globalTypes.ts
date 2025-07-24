@@ -74,3 +74,10 @@ export type ServiceImageType = {
   isBackdrop: boolean;
   category: string;
 }
+
+
+export type ServiceDescriptionsType = {
+  title: string;
+  description: React.ReactNode;
+  subDescription: React.ReactNode;
+}

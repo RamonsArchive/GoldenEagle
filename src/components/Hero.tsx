@@ -30,7 +30,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
         if (!isAnimatingRef.current) {
           handleImageTransition("right");
         }
-      }, 3000);
+      }, 4000);
     };
 
     const timer = setTimeout(startAutoRotation, 2000);
@@ -52,7 +52,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
         if (!isAnimatingRef.current) {
           handleImageTransition("right");
         }
-      }, 3000);
+      }, 4000);
     }
   };
 
