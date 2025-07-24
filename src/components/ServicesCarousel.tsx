@@ -50,7 +50,7 @@ const OFF_SCREEN = {
   LEFT: -40, // 30px width + 10px padding
 
   // Right side: container width + some padding
-  RIGHT: 210, // 200px container + 10px padding
+  RIGHT: 40, // 200px container + 10px padding
 };
 
 const ServicesCarousel = ({
@@ -226,18 +226,13 @@ const ServicesCarousel = ({
       // Position it off-screen right
       gsap.set(newRightImage, {
         x: OFF_SCREEN.RIGHT,
-        scale: 0.7,
+        scale: 0.1,
         opacity: 1,
       });
 
-      // Add to DOM
       document
-        .getElementById("right-carousel-image-mobile")
-        ?.parentNode?.appendChild(newRightImage);
-
-      //     document
-      //   .querySelector(".relative.w-\\[200px\\]")
-      //   ?.appendChild(newRightImage);
+        .querySelector(".relative.w-\\[200px\\]")
+        ?.appendChild(newRightImage);
 
       imageTl
         // Fade out main image
@@ -255,7 +250,7 @@ const ServicesCarousel = ({
           "#left-carousel-image-mobile",
           {
             x: OFF_SCREEN.LEFT,
-            scale: 0.7,
+            scale: 0.1,
             opacity: 0,
             duration: 0.6,
             ease: "power2.inOut",
@@ -302,7 +297,8 @@ const ServicesCarousel = ({
 
       const newLeftImage = document.createElement("div");
       newLeftImage.id = "temp-left-image";
-      newLeftImage.className = "carousel-side-image-mobile absolute";
+      newLeftImage.className =
+        "carousel-side-image-mobile absolute z-20 w-[30px] h-[50px]";
       newLeftImage.innerHTML = `
         <img src="${prevPrevImage.url}" alt="${prevPrevImage.alt || "alt"}" 
              class="w-full h-full object-cover rounded-xl" />
@@ -310,25 +306,29 @@ const ServicesCarousel = ({
 
       gsap.set(newLeftImage, {
         x: OFF_SCREEN.LEFT,
-        scale: 0.7,
+        scale: 0.1,
         opacity: 1,
       });
 
       document
-        .getElementById("left-carousel-image-mobile")
-        ?.parentNode?.appendChild(newLeftImage);
+        .querySelector(".relative.w-\\[200px\\]")
+        ?.appendChild(newLeftImage);
 
       imageTl
-        .to("#carousel-main-image-mobile", {
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.inOut",
-        })
+        .to(
+          "#carousel-main-image-mobile",
+          {
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.inOut",
+          },
+          0.1
+        )
         .to(
           "#right-carousel-image-mobile",
           {
             x: OFF_SCREEN.RIGHT,
-            scale: 0.7,
+            scale: 0.1,
             opacity: 0,
             duration: 0.6,
             ease: "power2.inOut",
