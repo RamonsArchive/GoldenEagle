@@ -133,5 +133,5 @@ body {
 }
 
 @utility carousel-side-image-mobile {
-  @apply relative w-[30px] h-[50px] z-30 rounded-xl shadow-xl border-1 border-white;
+  @apply relative z-30 rounded-xl shadow-xl border-1 border-white overflow-hidden;
 }

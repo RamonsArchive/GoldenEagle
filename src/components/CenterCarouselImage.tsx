@@ -20,7 +20,7 @@ const CenterCarouselImage = ({
         alt={serviceImage.alt || "alt"}
         sizes={isMobile ? "10vw" : "50vw"}
         fill
-        className="object-cover object-top overflow-hidden rounded-xl border-1 border-white shadow-xl"
+        className="object-cover object-top overflow-hidden rounded-xl"
       />
     </div>
   );

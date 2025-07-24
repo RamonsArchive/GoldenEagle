@@ -10,6 +10,49 @@ import LeftCarouselImage from "./LeftCarouselImage";
 import RightCarouselImage from "./RightCarouselImage";
 import CenterCarouselImage from "./CenterCarouselImage";
 
+// EXACT position calculations based on your layout:
+// Container: 200px wide
+// Left image: 30px wide, positioned at left-0 (absolute left edge)
+// Center image: 36px wide, positioned at left-1/2 -translate-x-1/2 (perfectly centered)
+// Right image: 30px wide, positioned at right-0 (absolute right edge)
+
+const EXACT_POSITIONS = {
+  // Left image: positioned at absolute left (0px from container left)
+  LEFT: 0,
+
+  // Center image: 36px wide, centered in 200px container
+  // left-1/2 -translate-x-1/2 means: (200px / 2) - (36px / 2) = 100px - 18px = 82px
+  CENTER: 82,
+
+  // Right image: 30px wide, positioned at absolute right
+  // right-0 means: 200px - 30px = 170px from left edge
+  RIGHT: 170,
+};
+
+// Animation distances (how far each element needs to move)
+const MOVE_DISTANCES = {
+  // From left to center: 82px - 0px = 82px
+  LEFT_TO_CENTER: 82,
+
+  // From center to right: 170px - 82px = 88px
+  CENTER_TO_RIGHT: 88,
+
+  // From right to center: 82px - 170px = -88px
+  RIGHT_TO_CENTER: -88,
+
+  // From center to left: 0px - 82px = -82px
+  CENTER_TO_LEFT: -82,
+};
+
+// Off-screen positions for temp elements
+const OFF_SCREEN = {
+  // Left side: element width + some padding
+  LEFT: -40, // 30px width + 10px padding
+
+  // Right side: container width + some padding
+  RIGHT: 210, // 200px container + 10px padding
+};
+
 const ServicesCarousel = ({
   servicesData,
   randomize = false,
@@ -47,7 +90,11 @@ const ServicesCarousel = ({
   }, [awsServicesImages, randomize]);
 
   const calculateImageIndex = (index: number) => {
-    return (index + carouselImages.length) % carouselImages.length;
+    console.log("index", index);
+    console.log("carouselImages.length", carouselImages.length);
+    const newIndex = (index + carouselImages.length) % carouselImages.length;
+    console.log("newIndex", newIndex);
+    return newIndex;
   };
 
   const currentImage = carouselImages[currentIndex];
@@ -122,41 +169,55 @@ const ServicesCarousel = ({
     const imageTl = gsap.timeline({
       onComplete: () => {
         // Update state AFTER all animations complete
+        if (direction === "right") {
+          document.getElementById("temp-right-image")?.remove();
+        } else {
+          document.getElementById("temp-left-image")?.remove();
+        }
         console.log("updating index", newIndex);
         setCurrentIndex(newIndex);
         isAnimatingRef.current = false;
+        // Reset ALL positions to exact default states (instant with gsap.set)
+        gsap.set("#left-carousel-image-mobile", {
+          x: 0, // Back to left-0 position
+          scale: 1,
+          opacity: 1,
+        });
+        gsap.set("#center-carousel-image-mobile", {
+          x: 0, // Back to left-1/2 -translate-x-1/2 position
+          scale: 1,
+        });
+        gsap.set("#right-carousel-image-mobile", {
+          x: 0, // Back to right-0 position
+          scale: 1,
+          opacity: 1,
+        });
 
-        // Fade main image back in and also the temp image with the real image
+        // Update state and reset animation flag
+        setCurrentIndex(newIndex);
+        isAnimatingRef.current = false;
+
+        // Fade main image back in
         gsap.to("#carousel-main-image-mobile", {
           opacity: 1,
           duration: 0.3,
           ease: "power2.inOut",
         });
-        if (direction === "right") {
-          gsap.to("#right-carousel-image-mobile", {
-            opacity: 1,
-            duration: 0.3,
-            ease: "power2.inOut",
-          });
-        } else {
-          gsap.to("#left-carousel-image-mobile", {
-            opacity: 1,
-            duration: 0.3,
-            ease: "power2.inOut",
-          });
-        }
+
+        /// text animations next
       },
     });
 
     if (direction === "right") {
       // Create new image element for the incoming image (currentIndex + 2)
-      const nextNextIndex = calculateImageIndex(currentIndex + 2);
+      const nextNextIndex = calculateImageIndex(newIndex + 1);
       const nextNextImage = carouselImages[nextNextIndex];
 
       // Create temporary image element
       const newRightImage = document.createElement("div");
       newRightImage.id = "temp-right-image";
-      newRightImage.className = "carousel-side-image-mobile absolute";
+      newRightImage.className =
+        "carousel-side-image-mobile absolute z-20 w-[30px] h-[50px]";
       newRightImage.innerHTML = `
         <img src="${nextNextImage.url}" alt="${nextNextImage.alt || "alt"}" 
              class="w-full h-full object-cover rounded-xl" />
@@ -164,11 +225,9 @@ const ServicesCarousel = ({
 
       // Position it off-screen right
       gsap.set(newRightImage, {
-        x: 210,
-        scale: 0.1,
+        x: OFF_SCREEN.RIGHT,
+        scale: 0.7,
         opacity: 1,
-        width: "30px",
-        height: "50px",
       });
 
       // Add to DOM
@@ -176,19 +235,27 @@ const ServicesCarousel = ({
         .getElementById("right-carousel-image-mobile")
         ?.parentNode?.appendChild(newRightImage);
 
+      //     document
+      //   .querySelector(".relative.w-\\[200px\\]")
+      //   ?.appendChild(newRightImage);
+
       imageTl
         // Fade out main image
-        .to("#carousel-main-image-mobile", {
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.inOut",
-        })
+        .to(
+          "#carousel-main-image-mobile",
+          {
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.inOut",
+          },
+          0.1
+        )
         // Slide left image out
         .to(
           "#left-carousel-image-mobile",
           {
-            x: -140,
-            scale: 0.6,
+            x: OFF_SCREEN.LEFT,
+            scale: 0.7,
             opacity: 0,
             duration: 0.6,
             ease: "power2.inOut",
@@ -199,7 +266,7 @@ const ServicesCarousel = ({
         .to(
           "#center-carousel-image-mobile",
           {
-            x: -70,
+            x: MOVE_DISTANCES.CENTER_TO_LEFT,
             scale: 1,
             duration: 0.6,
             ease: "power2.inOut",
@@ -210,7 +277,7 @@ const ServicesCarousel = ({
         .to(
           "#right-carousel-image-mobile",
           {
-            x: -70,
+            x: MOVE_DISTANCES.RIGHT_TO_CENTER,
             scale: 1.2,
             duration: 0.6,
             ease: "power2.inOut",
@@ -221,39 +288,16 @@ const ServicesCarousel = ({
         .to(
           "#temp-right-image",
           {
-            x: 140,
+            x: EXACT_POSITIONS.RIGHT,
             scale: 1,
             duration: 0.6,
             ease: "power2.inOut",
           },
           "<"
-        )
-
-        .call(() => {
-          // Clean up temp element
-          document.getElementById("temp-right-image")?.remove();
-
-          // Reset positions smoothly without gsap.set flash
-          gsap.to("#left-carousel-image-mobile", {
-            x: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.1,
-          });
-          gsap.to("#center-carousel-image-mobile", {
-            x: 0,
-            scale: 1.2,
-            duration: 0.1,
-          });
-          gsap.to("#right-carousel-image-mobile", {
-            x: 0,
-            scale: 1,
-            duration: 0.1,
-          });
-        });
+        );
     } else {
       // Moving left - similar approach
-      const prevPrevIndex = calculateImageIndex(currentIndex - 2);
+      const prevPrevIndex = calculateImageIndex(newIndex - 1);
       const prevPrevImage = carouselImages[prevPrevIndex];
 
       const newLeftImage = document.createElement("div");
@@ -265,11 +309,9 @@ const ServicesCarousel = ({
       `;
 
       gsap.set(newLeftImage, {
-        x: -210,
-        scale: 0.8,
+        x: OFF_SCREEN.LEFT,
+        scale: 0.7,
         opacity: 1,
-        width: "30px",
-        height: "50px",
       });
 
       document
@@ -285,8 +327,8 @@ const ServicesCarousel = ({
         .to(
           "#right-carousel-image-mobile",
           {
-            x: 140,
-            scale: 0.6,
+            x: OFF_SCREEN.RIGHT,
+            scale: 0.7,
             opacity: 0,
             duration: 0.6,
             ease: "power2.inOut",
@@ -296,7 +338,7 @@ const ServicesCarousel = ({
         .to(
           "#center-carousel-image-mobile",
           {
-            x: 70,
+            x: MOVE_DISTANCES.CENTER_TO_RIGHT,
             scale: 1,
             duration: 0.6,
             ease: "power2.inOut",
@@ -306,7 +348,7 @@ const ServicesCarousel = ({
         .to(
           "#left-carousel-image-mobile",
           {
-            x: 70,
+            x: MOVE_DISTANCES.LEFT_TO_CENTER,
             scale: 1.2,
             duration: 0.6,
             ease: "power2.inOut",
@@ -316,34 +358,13 @@ const ServicesCarousel = ({
         .to(
           "#temp-left-image",
           {
-            x: 0,
+            x: EXACT_POSITIONS.LEFT,
             scale: 1,
             duration: 0.6,
             ease: "power2.inOut",
           },
           "<"
-        )
-        .call(() => {
-          document.getElementById("temp-left-image")?.remove();
-
-          gsap.to("#left-carousel-image-mobile", {
-            x: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.1,
-          });
-          gsap.to("#center-carousel-image-mobile", {
-            x: 0,
-            scale: 1.2,
-            duration: 0.1,
-          });
-          gsap.to("#right-carousel-image-mobile", {
-            x: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.1,
-          });
-        });
+        );
     }
   };
 
@@ -362,7 +383,10 @@ const ServicesCarousel = ({
 
   return (
     <>
-      <div className="flex flex-col xs:hidden w-full h-full gap-5 bg-slate-900/70 rounded-xl">
+      <div
+        id="mobile-service-container"
+        className="flex flex-col xs:hidden w-full h-full gap-5 bg-slate-900/70 rounded-xl"
+      >
         <div className="relative flex flex-col w-full h-[60vh] z-20">
           <Image
             id="carousel-main-image-mobile"
@@ -373,47 +397,76 @@ const ServicesCarousel = ({
             className="carousel-main-image-mobile object-cover rounded-t-xl"
           />
           <div className="absolute bottom-0 left-0 right-0 h-[100px] w-full flex justify-center items-center">
-            <div className="flex items-center justify-between w-full max-w-[200px] px-4">
-              <LeftCarouselImage
-                id="left-carousel-image-mobile"
-                serviceImage={prevImage}
-                styles="carousel-side-image-mobile cursor-pointer"
-                onClick={() => handleArrowClick("left")}
-                isMobile={true}
-              />
-              <CenterCarouselImage
-                id="center-carousel-image-mobile"
-                serviceImage={currentImage}
-                styles="carousel-side-image-mobile"
-                isMobile={true}
-              />
-              <RightCarouselImage
-                id="right-carousel-image-mobile"
-                serviceImage={nextImage}
-                styles="carousel-side-image-mobile cursor-pointer"
-                onClick={() => handleArrowClick("right")}
-                isMobile={true}
-              />
+            <div className="relative w-[200px] h-[50px]">
+              {/* Left image - positioned absolutely */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20 rounded-xl">
+                <LeftCarouselImage
+                  id="left-carousel-image-mobile"
+                  serviceImage={prevImage}
+                  styles="carousel-side-image-mobile cursor-pointer w-[30px] h-[50px]"
+                  onClick={() => handleArrowClick("left")}
+                  isMobile={true}
+                />
+              </div>
+
+              {/* Center image - positioned absolutely */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 rounded-xl">
+                <CenterCarouselImage
+                  id="center-carousel-image-mobile"
+                  serviceImage={currentImage}
+                  styles="carousel-side-image-mobile w-[36px] h-[60px]" // 1.2x scale built in
+                  isMobile={true}
+                />
+              </div>
+
+              {/* Right image - positioned absolutely */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 rounded-xl">
+                <RightCarouselImage
+                  id="right-carousel-image-mobile"
+                  serviceImage={nextImage}
+                  styles="carousel-side-image-mobile cursor-pointer w-[30px] h-[50px]"
+                  onClick={() => handleArrowClick("right")}
+                  isMobile={true}
+                />
+              </div>
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-5 w-full p-5">
-          <p className="font-montserrat text-[12px] text-white/80">
+          <p
+            id="carousel-image-index-mobile"
+            className="font-montserrat text-[12px] text-white/80"
+          >
             {currentIndex + 1} of {carouselImages.length} images
           </p>
-          <div className="flex flex-col gap-3">
-            <h1 className="font-montserrat font-bold text-[24px] text-white">
+          <div
+            id="carousel-image-description-mobile"
+            className="flex flex-col gap-3"
+          >
+            <h1
+              id="carousel-image-title-mobile"
+              className="font-montserrat font-bold text-[24px] text-white"
+            >
               {serviceCurrentImage?.title}
             </h1>
-            <h2 className="font-montserrat font-regular text-[16px] text-white/90">
+            <h2
+              id="carousel-image-description-mobile"
+              className="font-montserrat font-regular text-[16px] text-white/90"
+            >
               {serviceCurrentImage?.description}
             </h2>
-            <p className="font-montserrat font-light italic text-[12px] text-white/70">
+            <p
+              id="carousel-image-sub-description-mobile"
+              className="font-montserrat font-light italic text-[12px] text-white/70"
+            >
               {serviceCurrentImage?.subDescription}
             </p>
           </div>
           <div className="flex justify-end">
-            <p className="font-montserrat font-regular italic underline text-[12px] text-white/80 cursor-pointer hover:text-white transition-colors">
+            <p
+              id="carousel-image-view-all-photos-mobile"
+              className="font-montserrat font-regular italic underline text-[12px] text-white/80 cursor-pointer hover:text-white transition-colors"
+            >
               View all photos
             </p>
           </div>
