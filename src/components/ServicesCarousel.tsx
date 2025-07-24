@@ -2,7 +2,13 @@
 import { ServiceImageType, ServicesData } from "@/lib/globalTypes";
 import { shuffleArray } from "@/lib/utils";
 import Image from "next/image";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { serviceDescriptions } from "@/constants";
@@ -50,7 +56,7 @@ const OFF_SCREEN = {
   LEFT: -40, // 30px width + 10px padding
 
   // Right side: container width + some padding
-  RIGHT: 40, // 200px container + 10px padding
+  RIGHT: 210, // 200px container + 10px padding
 };
 
 const ServicesCarousel = ({
@@ -68,11 +74,9 @@ const ServicesCarousel = ({
   const isAnimatingRef = useRef(false);
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  console.log("currentIndex", currentIndex);
 
   const carouselImages = useMemo(() => {
     const allImages: ServiceImageType[] = [];
-
     Object.entries(awsServicesImages).forEach(([category, images]) => {
       if (images && images.length > 0) {
         allImages.push(
@@ -90,19 +94,12 @@ const ServicesCarousel = ({
   }, [awsServicesImages, randomize]);
 
   const calculateImageIndex = (index: number) => {
-    console.log("index", index);
-    console.log("carouselImages.length", carouselImages.length);
-    const newIndex = (index + carouselImages.length) % carouselImages.length;
-    console.log("newIndex", newIndex);
-    return newIndex;
+    return (index + carouselImages.length) % carouselImages.length;
   };
 
   const currentImage = carouselImages[currentIndex];
   const prevImage = carouselImages[calculateImageIndex(currentIndex - 1)];
   const nextImage = carouselImages[calculateImageIndex(currentIndex + 1)];
-  console.log("currentImage", currentImage);
-  console.log("prevImage", prevImage);
-  console.log("nextImage", nextImage);
 
   const categoryCurrentImage = currentImage.category;
   const categoryPrevImage = prevImage.category;
@@ -111,8 +108,6 @@ const ServicesCarousel = ({
   const serviceCurrentImage = serviceDescriptions.get(categoryCurrentImage);
   const servicePrevImage = serviceDescriptions.get(categoryPrevImage);
   const serviceNextImage = serviceDescriptions.get(categoryNextImage);
-
-  console.log("image current", carouselImages[currentIndex].url);
 
   useEffect(() => {
     const startAutoRotation = () => {
@@ -139,7 +134,7 @@ const ServicesCarousel = ({
         }
       };
     }
-  }, [autoPlay, autoPlayInterval]);
+  }, [autoPlay, autoPlayInterval, currentIndex]);
 
   const restartAutoRotation = () => {
     if (autoPlay && autoRotateRef.current) {
@@ -151,222 +146,216 @@ const ServicesCarousel = ({
       }, autoPlayInterval);
     }
   };
-  const handleImageTransition = (direction: "left" | "right") => {
-    console.log("handleImageTransition", direction);
-    console.log("isAnimatingRef.current", isAnimatingRef.current);
+  const handleImageTransition = useCallback(
+    (direction: "left" | "right") => {
+      if (isAnimatingRef.current) return;
+      isAnimatingRef.current = true;
 
-    if (isAnimatingRef.current) return;
-    isAnimatingRef.current = true;
+      // Calculate new index immediately
+      const newIndex =
+        direction === "left"
+          ? calculateImageIndex(currentIndex - 1)
+          : calculateImageIndex(currentIndex + 1);
 
-    // Calculate new index immediately
-    const newIndex =
-      direction === "left"
-        ? calculateImageIndex(currentIndex - 1)
-        : calculateImageIndex(currentIndex + 1);
+      const imageTl = gsap.timeline({
+        onComplete: () => {
+          // Update state AFTER all animations complete
+          if (direction === "right") {
+            document.getElementById("temp-right-image")?.remove();
+          } else {
+            document.getElementById("temp-left-image")?.remove();
+          }
+          console.log("updating index", newIndex);
+          setCurrentIndex(newIndex);
+          isAnimatingRef.current = false;
+          // Reset ALL positions to exact default states (instant with gsap.set)
+          gsap.set("#left-carousel-image-mobile", {
+            x: 0, // Back to left-0 position
+            scale: 1,
+            opacity: 1,
+          });
+          gsap.set("#center-carousel-image-mobile", {
+            x: 0, // Back to left-1/2 -translate-x-1/2 position
+            scale: 1,
+          });
+          gsap.set("#right-carousel-image-mobile", {
+            x: 0, // Back to right-0 position
+            scale: 1,
+            opacity: 1,
+          });
 
-    console.log("newIndex", newIndex);
+          // Fade main image back in
+          gsap.to("#carousel-main-image-mobile", {
+            opacity: 1,
+            duration: 0.3,
+            ease: "power2.inOut",
+          });
 
-    const imageTl = gsap.timeline({
-      onComplete: () => {
-        // Update state AFTER all animations complete
-        if (direction === "right") {
-          document.getElementById("temp-right-image")?.remove();
-        } else {
-          document.getElementById("temp-left-image")?.remove();
-        }
-        console.log("updating index", newIndex);
-        setCurrentIndex(newIndex);
-        isAnimatingRef.current = false;
-        // Reset ALL positions to exact default states (instant with gsap.set)
-        gsap.set("#left-carousel-image-mobile", {
-          x: 0, // Back to left-0 position
-          scale: 1,
-          opacity: 1,
-        });
-        gsap.set("#center-carousel-image-mobile", {
-          x: 0, // Back to left-1/2 -translate-x-1/2 position
-          scale: 1,
-        });
-        gsap.set("#right-carousel-image-mobile", {
-          x: 0, // Back to right-0 position
-          scale: 1,
-          opacity: 1,
-        });
+          /// text animations next
+        },
+      });
 
-        // Update state and reset animation flag
-        setCurrentIndex(newIndex);
-        isAnimatingRef.current = false;
+      if (direction === "right") {
+        // Create new image element for the incoming image (currentIndex + 2)
+        const nextNextIndex = calculateImageIndex(newIndex + 1);
+        const nextNextImage = carouselImages[nextNextIndex];
 
-        // Fade main image back in
-        gsap.to("#carousel-main-image-mobile", {
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.inOut",
-        });
-
-        /// text animations next
-      },
-    });
-
-    if (direction === "right") {
-      // Create new image element for the incoming image (currentIndex + 2)
-      const nextNextIndex = calculateImageIndex(newIndex + 1);
-      const nextNextImage = carouselImages[nextNextIndex];
-
-      // Create temporary image element
-      const newRightImage = document.createElement("div");
-      newRightImage.id = "temp-right-image";
-      newRightImage.className =
-        "carousel-side-image-mobile absolute z-20 w-[30px] h-[50px]";
-      newRightImage.innerHTML = `
+        // Create temporary image element
+        const newRightImage = document.createElement("div");
+        newRightImage.id = "temp-right-image";
+        newRightImage.className =
+          "carousel-side-image-mobile absolute z-20 w-[30px] h-[50px]";
+        newRightImage.innerHTML = `
         <img src="${nextNextImage.url}" alt="${nextNextImage.alt || "alt"}" 
              class="w-full h-full object-cover rounded-xl" />
       `;
 
-      // Position it off-screen right
-      gsap.set(newRightImage, {
-        x: OFF_SCREEN.RIGHT,
-        scale: 0.1,
-        opacity: 1,
-      });
+        // Position it off-screen right
+        gsap.set(newRightImage, {
+          x: OFF_SCREEN.RIGHT,
+          scale: 0.1,
+          opacity: 1,
+        });
 
-      document
-        .querySelector(".relative.w-\\[200px\\]")
-        ?.appendChild(newRightImage);
+        document
+          .querySelector(".relative.w-\\[200px\\]")
+          ?.appendChild(newRightImage);
 
-      imageTl
-        // Fade out main image
-        .to(
-          "#carousel-main-image-mobile",
-          {
-            opacity: 0,
-            duration: 0.3,
-            ease: "power2.inOut",
-          },
-          0.1
-        )
-        // Slide left image out
-        .to(
-          "#left-carousel-image-mobile",
-          {
-            x: OFF_SCREEN.LEFT,
-            scale: 0.1,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<0.1"
-        )
-        // Move center to left position
-        .to(
-          "#center-carousel-image-mobile",
-          {
-            x: MOVE_DISTANCES.CENTER_TO_LEFT,
-            scale: 1,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<"
-        )
-        // Move right to center position
-        .to(
-          "#right-carousel-image-mobile",
-          {
-            x: MOVE_DISTANCES.RIGHT_TO_CENTER,
-            scale: 1.2,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<"
-        )
-        // Animate new image into right position
-        .to(
-          "#temp-right-image",
-          {
-            x: EXACT_POSITIONS.RIGHT,
-            scale: 1,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<"
-        );
-    } else {
-      // Moving left - similar approach
-      const prevPrevIndex = calculateImageIndex(newIndex - 1);
-      const prevPrevImage = carouselImages[prevPrevIndex];
+        imageTl
+          // Fade out main image
+          .to(
+            "#carousel-main-image-mobile",
+            {
+              opacity: 0,
+              duration: 0.3,
+              ease: "power2.inOut",
+            },
+            0.1
+          )
+          // Slide left image out
+          .to(
+            "#left-carousel-image-mobile",
+            {
+              x: OFF_SCREEN.LEFT,
+              scale: 0.1,
+              opacity: 0,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<0.1"
+          )
+          // Move center to left position
+          .to(
+            "#center-carousel-image-mobile",
+            {
+              x: MOVE_DISTANCES.CENTER_TO_LEFT,
+              scale: 1,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<"
+          )
+          // Move right to center position
+          .to(
+            "#right-carousel-image-mobile",
+            {
+              x: MOVE_DISTANCES.RIGHT_TO_CENTER,
+              scale: 1.2,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<"
+          )
+          // Animate new image into right position
+          .to(
+            "#temp-right-image",
+            {
+              x: EXACT_POSITIONS.RIGHT,
+              scale: 1,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<"
+          );
+      } else {
+        // Moving left - similar approach
+        const prevPrevIndex = calculateImageIndex(newIndex - 1);
+        const prevPrevImage = carouselImages[prevPrevIndex];
 
-      const newLeftImage = document.createElement("div");
-      newLeftImage.id = "temp-left-image";
-      newLeftImage.className =
-        "carousel-side-image-mobile absolute z-20 w-[30px] h-[50px]";
-      newLeftImage.innerHTML = `
+        const newLeftImage = document.createElement("div");
+        newLeftImage.id = "temp-left-image";
+        newLeftImage.className =
+          "carousel-side-image-mobile absolute z-20 w-[30px] h-[50px]";
+        newLeftImage.innerHTML = `
         <img src="${prevPrevImage.url}" alt="${prevPrevImage.alt || "alt"}" 
              class="w-full h-full object-cover rounded-xl" />
       `;
 
-      gsap.set(newLeftImage, {
-        x: OFF_SCREEN.LEFT,
-        scale: 0.1,
-        opacity: 1,
-      });
+        gsap.set(newLeftImage, {
+          x: OFF_SCREEN.LEFT,
+          scale: 0.1,
+          opacity: 1,
+        });
 
-      document
-        .querySelector(".relative.w-\\[200px\\]")
-        ?.appendChild(newLeftImage);
+        document
+          .querySelector(".relative.w-\\[200px\\]")
+          ?.appendChild(newLeftImage);
 
-      imageTl
-        .to(
-          "#carousel-main-image-mobile",
-          {
-            opacity: 0,
-            duration: 0.3,
-            ease: "power2.inOut",
-          },
-          0.1
-        )
-        .to(
-          "#right-carousel-image-mobile",
-          {
-            x: OFF_SCREEN.RIGHT,
-            scale: 0.1,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<0.1"
-        )
-        .to(
-          "#center-carousel-image-mobile",
-          {
-            x: MOVE_DISTANCES.CENTER_TO_RIGHT,
-            scale: 1,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<"
-        )
-        .to(
-          "#left-carousel-image-mobile",
-          {
-            x: MOVE_DISTANCES.LEFT_TO_CENTER,
-            scale: 1.2,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<"
-        )
-        .to(
-          "#temp-left-image",
-          {
-            x: EXACT_POSITIONS.LEFT,
-            scale: 1,
-            duration: 0.6,
-            ease: "power2.inOut",
-          },
-          "<"
-        );
-    }
-  };
+        imageTl
+          .to(
+            "#carousel-main-image-mobile",
+            {
+              opacity: 0,
+              duration: 0.3,
+              ease: "power2.inOut",
+            },
+            0.1
+          )
+          .to(
+            "#right-carousel-image-mobile",
+            {
+              x: 40,
+              scale: 0.1,
+              opacity: 0,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<0.1"
+          )
+          .to(
+            "#center-carousel-image-mobile",
+            {
+              x: MOVE_DISTANCES.CENTER_TO_RIGHT,
+              scale: 1,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<"
+          )
+          .to(
+            "#left-carousel-image-mobile",
+            {
+              x: MOVE_DISTANCES.LEFT_TO_CENTER,
+              scale: 1.2,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<"
+          )
+          .to(
+            "#temp-left-image",
+            {
+              x: EXACT_POSITIONS.LEFT,
+              scale: 1,
+              duration: 0.6,
+              ease: "power2.inOut",
+            },
+            "<"
+          );
+      }
+    },
+    [currentIndex, calculateImageIndex]
+  );
 
   const handleArrowClick = (direction: "left" | "right") => {
     handleImageTransition(direction);

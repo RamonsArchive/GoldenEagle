@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import LazyImage from "./LazyImage";
 
 const BeforeAfterCard = ({
   id,
@@ -26,12 +27,13 @@ const BeforeAfterCard = ({
             id="before-image"
             className={`relative flex w-full ${imageStyles}`}
           >
-            <Image
+            <LazyImage
               src={beforeImage}
               alt="before"
               sizes={`${isMobile ? "70vw" : "50vw"}`}
-              fill
-              className="object-cover object-top rounded-xl shadow-lg"
+              isFill={true}
+              containerClassName="w-full h-full"
+              imageClassName="object-cover object-top rounded-xl shadow-lg z-10"
             />
           </div>
         </div>
@@ -43,12 +45,13 @@ const BeforeAfterCard = ({
             id="after-image"
             className={`relative flex w-full ${imageStyles}`}
           >
-            <Image
+            <LazyImage
               src={afterImage}
               alt="after"
               sizes={`${isMobile ? "70vw" : "50vw"}`}
-              fill
-              className="object-cover object-top rounded-xl shadow-lg"
+              isFill={true}
+              containerClassName="w-full h-full"
+              imageClassName="object-cover object-top rounded-xl shadow-lg"
             />
           </div>
         </div>
@@ -59,12 +62,13 @@ const BeforeAfterCard = ({
             <h1 className="text-card-title">Before</h1>
           </div>
           <div className={`relative flex w-full min-h-[300px] ${imageStyles}`}>
-            <Image
+            <LazyImage
               src={beforeImage}
               alt="before"
               sizes={`${isMobile ? "70vw" : "50vw"}`}
-              fill
-              className="object-cover object-top rounded-xl shadow-lg"
+              isFill={true}
+              containerClassName="w-full h-full"
+              imageClassName="object-cover object-top rounded-xl shadow-lg"
             />
           </div>
         </div>
@@ -92,12 +96,13 @@ const BeforeAfterCard = ({
             <h1 className="text-card-title">After</h1>
           </div>
           <div className={`relative flex w-full min-h-[300px] ${imageStyles}`}>
-            <Image
+            <LazyImage
               src={afterImage}
               alt="after"
               sizes={`${isMobile ? "70vw" : "50vw"}`}
-              fill
-              className="object-cover object-top rounded-xl shadow-lg"
+              isFill={true}
+              containerClassName="w-full h-full"
+              imageClassName="object-cover object-top rounded-xl shadow-lg"
             />
           </div>
         </div>

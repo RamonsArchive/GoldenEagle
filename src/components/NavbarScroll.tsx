@@ -42,15 +42,9 @@ const NavbarScroll = () => {
   }, [isVisible]);
 
   useGSAP(() => {
-    console.log("entered useGSAP");
-    console.log("isMobile", isMobile);
-    console.log("navLinksRef.current", navLinksRef.current);
-    console.log("isVisible", isVisible);
     if (isMobile || !navLinksRef.current || !isVisible) return;
 
     const navElements = navLinksRef.current.querySelectorAll(".nav-link");
-    console.log("Found nav elements:", navElements.length);
-
     if (navElements.length === 0) {
       console.warn("No .nav-link elements found!");
       return;
@@ -60,10 +54,8 @@ const NavbarScroll = () => {
     if (splitTextRef.current) {
       splitTextRef.current.revert();
     }
-
-    console.log("should be animating");
     // Create new SplitText instance
-    splitTextRef.current = SplitText.create(navElements, {
+    splitTextRef.current = SplitText.create(Array.from(navElements), {
       type: "lines",
     });
 
@@ -82,7 +74,6 @@ const NavbarScroll = () => {
       ease: "power2.inOut",
       stagger: 0.1,
     });
-    console.log("exited useGSAP ");
   }, [navLinks.length, isMobile, isVisible]);
 
   // Cleanup on unmount

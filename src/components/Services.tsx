@@ -4,6 +4,7 @@ import Image from "next/image";
 import React from "react";
 import TextCard from "./TextCard";
 import ServicesCarousel from "./ServicesCarousel";
+import LazyImage from "./LazyImage";
 
 const Services = ({ servicesData }: { servicesData: ServicesData }) => {
   const { servicesBackdrop, awsServicesImages } = servicesData;
@@ -16,12 +17,14 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
       id="services"
       className="relative flex flex-col md:flex-row w-full min-h-screen py-15"
     >
-      <Image
+      <LazyImage
         src={servicesBackdrop.url}
         alt={servicesBackdrop.alt}
         sizes="100vw"
-        fill
-        className="object-cover object-top opacity-15 z-15"
+        isFill={true}
+        containerClassName="w-full h-full opacity-15"
+        imageClassName="object-cover object-top opacity-15 z-15"
+        skipIntersectionObserver={true}
       />
 
       <div className="flex flex-col md:hidden w-full h-full p-5 gap-10">

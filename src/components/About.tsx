@@ -8,15 +8,19 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitText from "gsap/SplitText";
+import useIntersectionObserver from "./UseIntersectionHook";
+import LazyImage from "./LazyImage";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const About = ({ aboutData }: { aboutData: AboutData }) => {
   const { aboutBackdrop, aboutGallery } = aboutData;
   const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
+  const { elementRef: aboutRef, isVisible: aboutIsVisible } =
+    useIntersectionObserver(0.1, "100px");
 
   useEffect(() => {
-    if (aboutGallery[0]) {
+    if (aboutIsVisible && aboutGallery[0]) {
       const img = new window.Image();
       img.onload = () => {
         const ratio = img.naturalWidth / img.naturalHeight;
@@ -24,10 +28,11 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       };
       img.src = aboutGallery[0].url;
     }
-  }, [aboutGallery]);
+  }, [aboutGallery, aboutIsVisible]);
 
   useGSAP(() => {
     // 1. INITIAL SETUP - Set cards to invisible and offset
+    if (!aboutIsVisible) return;
 
     const isMobile = window.innerWidth < 768;
     const beforeAfterCardSection = isMobile
@@ -289,21 +294,30 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
     // Cleanup function
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      titleSplits.forEach((split) => split.revert());
+      descriptionSplits.forEach((split) => split.revert());
     };
-  }, [aboutGallery]);
+  }, [aboutGallery, aboutIsVisible]);
 
   return (
     <main
       id="about"
+      ref={aboutRef}
       className="relative flex flex-col md:flex-row w-full min-h-screen py-15"
     >
-      <Image
-        src={aboutBackdrop.url}
-        alt="about backdrop"
-        sizes="100vw"
-        fill
-        className="object-cover object-top opacity-10"
-      />
+      {aboutIsVisible &&
+        (console.log("aboutIsVisible", aboutIsVisible),
+        (
+          <LazyImage
+            src={aboutBackdrop.url}
+            alt="about backdrop"
+            sizes="100vw"
+            isFill={true}
+            containerClassName="w-full h-full opacity-15"
+            imageClassName="object-cover object-top opacity-10"
+            skipIntersectionObserver={true}
+          />
+        ))}
 
       {/* Mobile Layout */}
       <div className="flex flex-col md:hidden w-full h-full p-5">
@@ -337,12 +351,13 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 aspectRatio: imageAspectRatio ? imageAspectRatio : "4/3",
               }}
             >
-              <Image
+              <LazyImage
                 src={aboutGallery[0].url}
                 alt="about gallery"
                 width={500}
                 height={400}
-                className="object-contain object-top rounded-xl shadow-lg"
+                containerClassName="w-full h-full"
+                imageClassName="object-contain object-top rounded-xl shadow-lg"
               />
             </div>
           </div>
@@ -480,12 +495,13 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
               aspectRatio: imageAspectRatio ? imageAspectRatio : "4/3",
             }}
           >
-            <Image
+            <LazyImage
               src={aboutGallery[0].url}
               alt="about gallery"
               width={1000}
               height={800}
-              className="object-contain object-top rounded-xl shadow-lg"
+              containerClassName="w-full h-full"
+              imageClassName="object-contain object-top rounded-xl shadow-lg"
             />
           </div>
         </div>
