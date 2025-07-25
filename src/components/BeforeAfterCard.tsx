@@ -20,7 +20,7 @@ const BeforeAfterCard = ({
 }) => {
   return (
     <>
-      <div id={id} className={`${isMobile ? "hidden" : { className }}`}>
+      <div id={id} className={`${isMobile ? "hidden" : className}`}>
         <div className="flex flex-col w-[50%] gap-5">
           <div className="flex flex-center flex-col w-full">
             <h1 className="text-card-about-title text-center">Before</h1>
