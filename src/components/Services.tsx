@@ -16,6 +16,10 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
     <main
       id="services"
       className="relative flex flex-col md:flex-row w-full min-h-screen py-15"
+      style={{
+        contain: "layout style paint",
+        contentVisibility: "auto",
+      }}
     >
       <LazyImage
         src={servicesBackdrop.url}
@@ -45,7 +49,7 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
         <div className="flex flex-col w-full h-full gap-5">
           <div className="flex flex-col w-full h-full gap-5"></div>
         </div>
-        <ServicesCarousel servicesData={servicesData} />
+        {<ServicesCarousel servicesData={servicesData} />}
       </div>
     </main>
   );

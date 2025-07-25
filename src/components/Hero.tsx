@@ -100,14 +100,14 @@ const Hero = ({ heroData }: { heroData: any }) => {
     });
 
     const heroText = new SplitText(".hero-title", {
-      type: "lines",
+      type: "words",
     });
     const heroSubText = new SplitText(".hero-subtitle", {
-      type: "lines",
+      type: "words",
     });
 
-    const heroLines = heroText.lines;
-    const heroSubLines = heroSubText.lines;
+    const heroLines = heroText.words;
+    const heroSubLines = heroSubText.words;
 
     // Set initial state on the LINES (not parents)
     gsap.set(heroLines, {
@@ -280,6 +280,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 sizes="50vw"
                 fill
                 className="hero-image"
+                priority
               />
             </div>
             <div className="relative w-full h-full justify-center items-center">
@@ -291,6 +292,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 sizes="50vw"
                 fill
                 className="hero-image"
+                priority
               />
             </div>
           </div>
@@ -306,6 +308,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
               sizes="50vw"
               fill
               className="object-cover object-top opacity-30"
+              priority
             />
             <div className="absolute x-translate-x-1/2 w-full h-full flex flex-col flex-center">
               <div
@@ -336,6 +339,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                   sizes="25vw"
                   fill
                   className="hero-image"
+                  priority
                 />
               </div>
               <div className="relative w-full h-full justify-center items-center">
@@ -347,6 +351,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                   sizes="25vw"
                   fill
                   className="hero-image"
+                  priority
                 />
               </div>
             </div>
@@ -361,6 +366,7 @@ const Hero = ({ heroData }: { heroData: any }) => {
                 sizes="50vw"
                 fill
                 className="hero-image"
+                priority
               />
               <LeftImageArrow
                 id="left-hero-arrow-desktop"

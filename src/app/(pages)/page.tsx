@@ -23,7 +23,8 @@ const Home = async () => {
       <Hero heroData={heroData.data} />
       <LazySection
         className="about-section"
-        threshold={0.1}
+        threshold={0.01}
+        reserveHeight={true}
         placeholder={
           <div className="min-h-screen bg-slate-900/20 flex flex-center">
             <div className="text-white/60 text-2xl font-bold">
@@ -36,7 +37,8 @@ const Home = async () => {
       </LazySection>
       <LazySection
         className="services-section"
-        threshold={0.1}
+        threshold={0.01}
+        reserveHeight={true}
         placeholder={
           <div className="min-h-screen bg-slate-900/20 flex flex-center">
             <div className="text-white/60 text-2xl font-bold">

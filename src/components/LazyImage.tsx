@@ -31,7 +31,7 @@ const LazyImage = ({
   [key: string]: any;
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const { elementRef, isVisible } = useIntersectionObserver(0.1, "200px");
+  const { elementRef, isVisible } = useIntersectionObserver(0.01, "100px");
 
   // For backdrop images, always consider them visible if skipIntersectionObserver is true
   const shouldShowImage = skipIntersectionObserver || isVisible || priority;

@@ -15,6 +15,7 @@ import { serviceDescriptions } from "@/constants";
 import LeftCarouselImage from "./LeftCarouselImage";
 import RightCarouselImage from "./RightCarouselImage";
 import CenterCarouselImage from "./CenterCarouselImage";
+import LazyImage from "./LazyImage";
 
 // EXACT position calculations based on your layout:
 // Container: 200px wide
@@ -377,13 +378,15 @@ const ServicesCarousel = ({
         className="flex flex-col xs:hidden w-full h-full gap-5 bg-slate-900/70 rounded-xl"
       >
         <div className="relative flex flex-col w-full h-[60vh] z-20">
-          <Image
+          <LazyImage
             id="carousel-main-image-mobile"
             src={carouselImages[currentIndex].url}
             alt={carouselImages[currentIndex].alt || "alt"}
             sizes="100vw"
-            fill
-            className="carousel-main-image-mobile object-cover rounded-t-xl"
+            isFill={true}
+            containerClassName="w-full h-full"
+            imageClassName="carousel-main-image-mobile object-cover rounded-t-xl"
+            skipIntersectionObserver={true}
           />
           <div className="absolute bottom-0 left-0 right-0 h-[100px] w-full flex justify-center items-center">
             <div className="relative w-[200px] h-[50px]">

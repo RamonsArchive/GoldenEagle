@@ -1,26 +1,28 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { AboutData } from "@/lib/globalTypes";
-import Image from "next/image";
 import TextCard from "./TextCard";
 import BeforeAfterCard from "./BeforeAfterCard";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitText from "gsap/SplitText";
-import useIntersectionObserver from "./UseIntersectionHook";
 import LazyImage from "./LazyImage";
+import { useBatchCardAnimation } from "./BatchAnimation";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const About = ({ aboutData }: { aboutData: AboutData }) => {
   const { aboutBackdrop, aboutGallery } = aboutData;
   const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
-  const { elementRef: aboutRef, isVisible: aboutIsVisible } =
-    useIntersectionObserver(0.1, "100px");
+  const isMobile = window.innerWidth < 768;
+  let titleElements: HTMLElement[] = [];
+  let descriptionElements: HTMLElement[] = [];
+  let titleSplits: SplitText[] = [];
+  let descriptionSplits: SplitText[] = [];
 
   useEffect(() => {
-    if (aboutIsVisible && aboutGallery[0]) {
+    if (aboutGallery[0]) {
       const img = new window.Image();
       img.onload = () => {
         const ratio = img.naturalWidth / img.naturalHeight;
@@ -28,35 +30,39 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       };
       img.src = aboutGallery[0].url;
     }
-  }, [aboutGallery, aboutIsVisible]);
+  }, [aboutGallery]);
 
   useGSAP(() => {
     // 1. INITIAL SETUP - Set cards to invisible and offset
-    if (!aboutIsVisible) return;
 
-    const isMobile = window.innerWidth < 768;
     const beforeAfterCardSection = isMobile
-      ? document.querySelector(".before-after-card-mobile")
-      : document.querySelector(".before-after-card");
+      ? document.querySelector(".before-after-card-about-mobile")
+      : document.querySelector(".before-after-card-about");
 
-    gsap.set([".text-card", ".image-card", beforeAfterCardSection], {
-      opacity: 0,
-      y: 50, // Use 'y' instead of 'yPercent'
-    });
+    console.log("beforeAfterCardSection", beforeAfterCardSection);
+    gsap.set(
+      [".text-card-about", ".image-card-about", beforeAfterCardSection],
+      {
+        opacity: 0,
+        y: 50, // Use 'y' instead of 'yPercent'
+      }
+    );
 
     // 2. Wait for DOM to be ready, then create SplitText
     // Get all text elements
-    const titleElements = document.querySelectorAll(".text-card-title");
-    const descriptionElements = document.querySelectorAll(
-      ".text-card-description"
+    titleElements = Array.from(
+      document.querySelectorAll(".text-card-about-title")
+    );
+    descriptionElements = Array.from(
+      document.querySelectorAll(".text-card-about-description")
     );
 
     // Create arrays to store SplitText instances
-    const titleSplits: SplitText[] = [];
-    const descriptionSplits: SplitText[] = [];
+    titleSplits = [];
+    descriptionSplits = [];
 
     // Create SplitText for each title
-    titleElements.forEach((titleEl, index) => {
+    titleElements.forEach((titleEl) => {
       const split = new SplitText(titleEl, { type: "words" });
       titleSplits.push(split);
 
@@ -68,7 +74,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
     });
 
     // Create SplitText for each description
-    descriptionElements.forEach((descEl, index) => {
+    descriptionElements.forEach((descEl) => {
       const split = new SplitText(descEl, { type: "lines" });
       descriptionSplits.push(split);
 
@@ -79,217 +85,223 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       });
     });
 
-    // 3. ANIMATE CARDS WITH SCROLL-CONTROLLED SCRUB
-    ScrollTrigger.batch([".text-card", ".image-card", beforeAfterCardSection], {
-      onEnter: (elements) => {
-        elements.forEach((element, index) => {
-          gsap.to(element, {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: element,
-              start: "top 90%",
-              end: "top 60%",
-              scrub: 1,
-              toggleActions: "play none none reverse",
-            },
-          });
-        });
-      },
-    });
+    // // 3. ANIMATE CARDS WITH SCROLL-CONTROLLED SCRUB
+    // ScrollTrigger.batch(
+    //   [".text-card-about", ".image-card-about", beforeAfterCardSection],
+    //   {
+    //     onEnter: (elements) => {
+    //       elements.forEach((element, index) => {
+    //         gsap.to(element, {
+    //           opacity: 1,
+    //           y: 0,
+    //           duration: 1,
+    //           ease: "power2.out",
+    //           scrollTrigger: {
+    //             trigger: element,
+    //             start: "top 90%",
+    //             end: "top 60%",
+    //             scrub: 1,
+    //             toggleActions: "play none none reverse",
+    //           },
+    //         });
+    //       });
+    //     },
+    //   }
+    // );
 
-    // 4. ANIMATE TEXT CONTENT - Using the stored SplitText instances
-    const textCards = document.querySelectorAll(".text-card");
-    textCards.forEach((card, cardIndex) => {
-      // Find the corresponding SplitText instances for this card
-      const titleInCard = card.querySelector(".text-card-title");
-      const descriptionInCard = card.querySelector(".text-card-description");
+    // // 4. ANIMATE TEXT CONTENT - Using the stored SplitText instances
+    // const textCards = document.querySelectorAll(".text-card-about");
+    // textCards.forEach((card) => {
+    //   // Find the corresponding SplitText instances for this card
+    //   const titleInCard = card.querySelector(".text-card-about-title");
+    //   const descriptionInCard = card.querySelector(
+    //     ".text-card-about-description"
+    //   );
 
-      let titleSplit: SplitText | null = null;
-      let descriptionSplit: SplitText | null = null;
+    //   let titleSplit: SplitText | null = null;
+    //   let descriptionSplit: SplitText | null = null;
 
-      // Find the matching SplitText instances
-      titleElements.forEach((titleEl, index) => {
-        if (titleEl === titleInCard) {
-          titleSplit = titleSplits[index];
-        }
-      });
+    //   // Find the matching SplitText instances
+    //   titleElements.forEach((titleEl, index) => {
+    //     if (titleEl === titleInCard) {
+    //       titleSplit = titleSplits[index];
+    //     }
+    //   });
 
-      descriptionElements.forEach((descEl, index) => {
-        if (descEl === descriptionInCard) {
-          descriptionSplit = descriptionSplits[index];
-        }
-      });
+    //   descriptionElements.forEach((descEl, index) => {
+    //     if (descEl === descriptionInCard) {
+    //       descriptionSplit = descriptionSplits[index];
+    //     }
+    //   });
 
-      // Create timeline for this card's text animation
-      const textTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: card,
-          start: "top 80%",
-          end: "top 50%",
-          scrub: 1.2,
-          toggleActions: "play none none reverse",
-        },
-      });
+    //   // Create timeline for this card's text animation
+    //   const textTl = gsap.timeline({
+    //     scrollTrigger: {
+    //       trigger: card,
+    //       start: "top 80%",
+    //       end: "top 50%",
+    //       scrub: 1.2,
+    //       toggleActions: "play none none reverse",
+    //     },
+    //   });
 
-      // Animate title words if they exist
-      if (titleSplit && (titleSplit as SplitText).words.length > 0) {
-        textTl.fromTo(
-          (titleSplit as SplitText).words,
-          {
-            opacity: 0,
-            y: 30,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.05,
-            ease: "power2.out",
-          }
-        );
-      }
+    //   // Animate title words if they exist
+    //   if (titleSplit && (titleSplit as SplitText).words.length > 0) {
+    //     textTl.fromTo(
+    //       (titleSplit as SplitText).words,
+    //       {
+    //         opacity: 0,
+    //         y: 30,
+    //       },
+    //       {
+    //         opacity: 1,
+    //         y: 0,
+    //         duration: 0.8,
+    //         stagger: 0.05,
+    //         ease: "power2.out",
+    //       }
+    //     );
+    //   }
 
-      // Animate description lines if they exist
-      if (
-        descriptionSplit &&
-        (descriptionSplit as SplitText).lines.length > 0
-      ) {
-        textTl.fromTo(
-          (descriptionSplit as SplitText).lines,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: "power2.out",
-          },
-          "-=0.4"
-        );
-      }
-    });
+    //   // Animate description lines if they exist
+    //   if (
+    //     descriptionSplit &&
+    //     (descriptionSplit as SplitText).lines.length > 0
+    //   ) {
+    //     textTl.fromTo(
+    //       (descriptionSplit as SplitText).lines,
+    //       {
+    //         opacity: 0,
+    //         y: 20,
+    //       },
+    //       {
+    //         opacity: 1,
+    //         y: 0,
+    //         duration: 0.6,
+    //         stagger: 0.08,
+    //         ease: "power2.out",
+    //       },
+    //       "-=0.4"
+    //     );
+    //   }
+    // });
 
-    // 5. SPECIAL HANDLING FOR IMAGE CARDS
-    const imageCards = document.querySelectorAll(".image-card");
-    imageCards.forEach((element) => {
-      const title = element.querySelector(".text-card-title");
-      const imageContainer = element.querySelector(".image-container");
+    // // 5. SPECIAL HANDLING FOR IMAGE CARDS
+    // const imageCards = document.querySelectorAll(".image-card-about");
+    // imageCards.forEach((element) => {
+    //   const title = element.querySelector(".text-card-about-title");
+    //   const imageContainer = element.querySelector(".image-container");
 
-      if (title && imageContainer) {
-        // Create SplitText for this specific image card title
-        let titleSplitLocal: SplitText | null = null;
-        titleElements.forEach((splitEl, index) => {
-          if (splitEl === title) {
-            titleSplitLocal = titleSplits[index];
-          }
-        });
+    //   if (title && imageContainer) {
+    //     // Create SplitText for this specific image card title
+    //     let titleSplitLocal: SplitText | null = null;
+    //     titleElements.forEach((splitEl, index) => {
+    //       if (splitEl === title) {
+    //         titleSplitLocal = titleSplits[index];
+    //       }
+    //     });
 
-        const imageTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: element,
-            start: "top 85%",
-            end: "top 55%",
-            scrub: 1,
-            toggleActions: "play none none reverse",
-          },
-        });
+    //     const imageTl = gsap.timeline({
+    //       scrollTrigger: {
+    //         trigger: element,
+    //         start: "top 85%",
+    //         end: "top 55%",
+    //         scrub: 1,
+    //         toggleActions: "play none none reverse",
+    //       },
+    //     });
 
-        if (
-          titleSplitLocal &&
-          (titleSplitLocal as SplitText).words.length > 0
-        ) {
-          imageTl
-            .fromTo(
-              (titleSplitLocal as SplitText).words,
-              {
-                opacity: 0,
-                y: 30,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                stagger: 0.05,
-                ease: "power2.out",
-              }
-            )
-            .fromTo(
-              imageContainer,
-              {
-                opacity: 0,
-                y: 30,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                ease: "power2.out",
-              },
-              "-=0.3"
-            );
-        }
-      }
-    });
+    //     if (
+    //       titleSplitLocal &&
+    //       (titleSplitLocal as SplitText).words.length > 0
+    //     ) {
+    //       imageTl
+    //         .fromTo(
+    //           (titleSplitLocal as SplitText).words,
+    //           {
+    //             opacity: 0,
+    //             y: 30,
+    //           },
+    //           {
+    //             opacity: 1,
+    //             y: 0,
+    //             duration: 0.6,
+    //             stagger: 0.05,
+    //             ease: "power2.out",
+    //           }
+    //         )
+    //         .fromTo(
+    //           imageContainer,
+    //           {
+    //             opacity: 0,
+    //             y: 30,
+    //           },
+    //           {
+    //             opacity: 1,
+    //             y: 0,
+    //             duration: 0.6,
+    //             ease: "power2.out",
+    //           },
+    //           "-=0.3"
+    //         );
+    //     }
+    //   }
+    // });
 
-    // 6. SPECIAL HANDLING FOR BEFORE-AFTER CARD
-    if (beforeAfterCardSection) {
-      const titles =
-        beforeAfterCardSection.querySelectorAll(".text-card-title");
-      const beforeImage = beforeAfterCardSection.querySelector("#before-image");
-      const afterImage = beforeAfterCardSection.querySelector("#after-image");
+    // // 6. SPECIAL HANDLING FOR BEFORE-AFTER CARD
+    // if (beforeAfterCardSection) {
+    //   const titles = beforeAfterCardSection.querySelectorAll(
+    //     ".text-card-about-title"
+    //   );
+    //   const beforeImage = beforeAfterCardSection.querySelector("#before-image");
+    //   const afterImage = beforeAfterCardSection.querySelector("#after-image");
 
-      const splitTitles: SplitText[] = [];
-      titleElements.forEach((titleEl, index) => {
-        if (Array.from(titles).includes(titleEl)) {
-          splitTitles.push(titleSplits[index]);
-        }
-      });
+    //   const splitTitles: SplitText[] = [];
+    //   titleElements.forEach((titleEl, index) => {
+    //     if (Array.from(titles).includes(titleEl)) {
+    //       splitTitles.push(titleSplits[index]);
+    //     }
+    //   });
 
-      if (splitTitles.length > 0) {
-        const beforeAfterTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: beforeAfterCardSection,
-            start: "top 85%",
-            end: "top 55%",
-            scrub: 1,
-            toggleActions: "play none none reverse",
-          },
-        });
+    //   if (splitTitles.length > 0) {
+    //     const beforeAfterTl = gsap.timeline({
+    //       scrollTrigger: {
+    //         trigger: beforeAfterCardSection,
+    //         start: "top 85%",
+    //         end: "top 55%",
+    //         scrub: 1,
+    //         toggleActions: "play none none reverse",
+    //       },
+    //     });
 
-        splitTitles.forEach((split) => {
-          beforeAfterTl.fromTo(
-            (split as SplitText).words,
-            { opacity: 0, y: 30 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.05,
-              ease: "power2.out",
-            }
-          );
-        });
+    //     splitTitles.forEach((split) => {
+    //       beforeAfterTl.fromTo(
+    //         (split as SplitText).words,
+    //         { opacity: 0, y: 30 },
+    //         {
+    //           opacity: 1,
+    //           y: 0,
+    //           duration: 0.6,
+    //           stagger: 0.05,
+    //           ease: "power2.out",
+    //         }
+    //       );
+    //     });
 
-        beforeAfterTl.fromTo(
-          beforeImage,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
-        );
+    //     beforeAfterTl.fromTo(
+    //       beforeImage,
+    //       { opacity: 0, y: 30 },
+    //       { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+    //     );
 
-        beforeAfterTl.fromTo(
-          afterImage,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-          "-=0.3"
-        );
-      }
-    }
+    //     beforeAfterTl.fromTo(
+    //       afterImage,
+    //       { opacity: 0, y: 30 },
+    //       { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+    //       "-=0.3"
+    //     );
+    //   }
+    // }
 
     // Cleanup function
     return () => {
@@ -297,33 +309,69 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       titleSplits.forEach((split) => split.revert());
       descriptionSplits.forEach((split) => split.revert());
     };
-  }, [aboutGallery, aboutIsVisible]);
+  }, [aboutGallery]);
+
+  const beforeAfterCardSection = isMobile
+    ? ".before-after-card-about-mobile"
+    : ".before-after-card-about";
+
+  useBatchCardAnimation("about", {
+    cardSelectors: [
+      ".text-card-about",
+      ".image-card-about",
+      beforeAfterCardSection,
+    ],
+    textSelectors: {
+      titles: [".text-card-about-title"],
+      descriptions: [".text-card-about-description"],
+    },
+    titleElements: titleElements,
+    descElements: descriptionElements,
+    titleSplits: titleSplits,
+    descSplits: descriptionSplits,
+    cardAnimation: {
+      startTrigger: "top 90%",
+      endTrigger: "top 60%",
+      scrub: 1,
+      duration: 1,
+      ease: "power2.out",
+    },
+    textAnimation: {
+      startTrigger: "top 80%",
+      endTrigger: "top 50%",
+      scrub: 1.2,
+      titleDuration: 0.8,
+      descDuration: 0.6,
+      titleStagger: 0.05,
+      descStagger: 0.08,
+    },
+  });
 
   return (
     <main
       id="about"
-      ref={aboutRef}
       className="relative flex flex-col md:flex-row w-full min-h-screen py-15"
+      style={{
+        contain: "layout style paint",
+        contentVisibility: "auto",
+      }}
     >
-      {aboutIsVisible &&
-        (console.log("aboutIsVisible", aboutIsVisible),
-        (
-          <LazyImage
-            src={aboutBackdrop.url}
-            alt="about backdrop"
-            sizes="100vw"
-            isFill={true}
-            containerClassName="w-full h-full opacity-15"
-            imageClassName="object-cover object-top opacity-10"
-            skipIntersectionObserver={true}
-          />
-        ))}
+      <LazyImage
+        src={aboutBackdrop.url}
+        alt="about backdrop"
+        sizes="100vw"
+        isFill={true}
+        containerClassName="w-full h-full opacity-15"
+        imageClassName="object-cover object-top opacity-10"
+        skipIntersectionObserver={true}
+      />
 
       {/* Mobile Layout */}
       <div className="flex flex-col md:hidden w-full h-full p-5">
         <div className="flex flex-col w-full h-full gap-10">
           <TextCard
             id="promise-mobile"
+            className="text-card-about"
             title="Our Promise"
             description={
               <>
@@ -333,16 +381,16 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 <span className="text-primary-400">reality</span>."
                 <br />
                 <span className="block mt-2">
-                  – The <span className="text-primary-400">Aguilar's</span>
+                  - The <span className="text-primary-400">Aguilar's</span>
                 </span>
               </>
             }
-            titleStyle="text-card-title"
-            descriptionStyle="text-card-description"
+            titleStyle="text-card-about-title"
+            descriptionStyle="text-card-about-description"
           />
 
-          <div className="image-card flex flex-col flex-center w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
-            <h1 className="text-card-title">
+          <div className="image-card-about flex flex-col flex-center w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
+            <h1 className="text-card-about-title">
               Meet the <span className="text-primary-400">Aguilar's</span>
             </h1>
             <div
@@ -364,6 +412,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
 
           <BeforeAfterCard
             id="before-after-card-mobile"
+            className="before-after-card-about-mobile"
             beforeImage={aboutGallery[2].url}
             afterImage={aboutGallery[1].url}
             imageStyles="h-[250px] sm:h-[300px] w-full rounded-xl shadow-lg"
@@ -372,6 +421,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
 
           <TextCard
             id="experience-location-mobile"
+            className="text-card-about"
             title="Experience & Location"
             description={
               <>
@@ -387,12 +437,13 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 construction partner."
               </>
             }
-            titleStyle="text-card-title"
-            descriptionStyle="text-card-description"
+            titleStyle="text-card-about-title"
+            descriptionStyle="text-card-about-description"
           />
 
           <TextCard
             id="credentials-trust-mobile"
+            className="text-card-about"
             title="Credentials & Trust"
             description={
               <>
@@ -410,8 +461,8 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 <span className="text-primary-400">satisfaction</span>.
               </>
             }
-            titleStyle="text-card-title"
-            descriptionStyle="text-card-description"
+            titleStyle="text-card-about-title"
+            descriptionStyle="text-card-about-description"
           />
         </div>
       </div>
@@ -421,6 +472,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
         <div className="flex flex-col w-full h-full gap-10">
           <TextCard
             id="promise-desktop"
+            className="text-card-about"
             title="Our Promise"
             description={
               <>
@@ -434,12 +486,13 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 </span>
               </>
             }
-            titleStyle="text-card-title"
-            descriptionStyle="text-card-description"
+            titleStyle="text-card-about-title"
+            descriptionStyle="text-card-about-description"
           />
 
           <TextCard
             id="experience-location-desktop"
+            className="text-card-about"
             title="Experience & Location"
             description={
               <>
@@ -455,12 +508,13 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 construction partner."
               </>
             }
-            titleStyle="text-card-title"
-            descriptionStyle="text-card-description"
+            titleStyle="text-card-about-title"
+            descriptionStyle="text-card-about-description"
           />
 
           <TextCard
             id="credentials-trust-desktop"
+            className="text-card-about"
             title="Credentials & Trust"
             description={
               <>
@@ -478,15 +532,15 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 <span className="text-primary-400">satisfaction</span>.
               </>
             }
-            titleStyle="text-card-title"
-            descriptionStyle="text-card-description"
+            titleStyle="text-card-about-title"
+            descriptionStyle="text-card-about-description"
           />
         </div>
       </div>
 
       <div className="hidden md:flex flex-1 flex-col gap-10 items-start p-10">
         <div className="image-card flex flex-col w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
-          <h1 className="text-card-title">
+          <h1 className="text-card-about-title">
             Meet the <span className="text-primary-400">Aguilar's</span>
           </h1>
           <div
@@ -508,6 +562,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
 
         <BeforeAfterCard
           id="before-after-card"
+          className="before-after-card-about"
           beforeImage={aboutGallery[2].url}
           afterImage={aboutGallery[1].url}
           imageStyles="h-[300px] lg:h-[400px] w-full rounded-xl shadow-lg"

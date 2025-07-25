@@ -5,12 +5,14 @@ import LazyImage from "./LazyImage";
 
 const BeforeAfterCard = ({
   id,
+  className,
   beforeImage,
   afterImage,
   imageStyles,
   isMobile = false,
 }: {
   id: string;
+  className?: string;
   beforeImage: string;
   afterImage: string;
   imageStyles: string;
@@ -18,10 +20,10 @@ const BeforeAfterCard = ({
 }) => {
   return (
     <>
-      <div id={id} className={`${isMobile ? "hidden" : "before-after-card"}`}>
+      <div id={id} className={`${isMobile ? "hidden" : { className }}`}>
         <div className="flex flex-col w-[50%] gap-5">
           <div className="flex flex-center flex-col w-full">
-            <h1 className="text-card-title text-center">Before</h1>
+            <h1 className="text-card-about-title text-center">Before</h1>
           </div>
           <div
             id="before-image"
@@ -39,7 +41,7 @@ const BeforeAfterCard = ({
         </div>
         <div className="flex flex-1 flex-col gap-5">
           <div className="flex flex-center flex-col w-full">
-            <h1 className="text-card-title text-center">After</h1>
+            <h1 className="text-card-about-title text-center">After</h1>
           </div>
           <div
             id="after-image"
@@ -56,10 +58,10 @@ const BeforeAfterCard = ({
           </div>
         </div>
       </div>
-      <div className={`${isMobile ? "before-after-card-mobile" : "hidden"}`}>
+      <div className={`${isMobile ? className : "hidden"}`}>
         <div className="flex flex-col w-full gap-5">
           <div className="flex flex-center flex-col w-full">
-            <h1 className="text-card-title">Before</h1>
+            <h1 className="text-card-about-title">Before</h1>
           </div>
           <div className={`relative flex w-full min-h-[300px] ${imageStyles}`}>
             <LazyImage
@@ -93,7 +95,7 @@ const BeforeAfterCard = ({
         </div>
         <div className="flex flex-col w-full gap-5">
           <div className="flex flex-center flex-col w-full">
-            <h1 className="text-card-title">After</h1>
+            <h1 className="text-card-about-title">After</h1>
           </div>
           <div className={`relative flex w-full min-h-[300px] ${imageStyles}`}>
             <LazyImage

@@ -1,6 +1,7 @@
 import { ServiceImageType } from "@/lib/globalTypes";
 import React from "react";
 import Image from "next/image";
+import LazyImage from "./LazyImage";
 
 const RightCarouselImage = ({
   id,
@@ -17,12 +18,13 @@ const RightCarouselImage = ({
 }) => {
   return (
     <div id={id} className={`${styles}`} onClick={onClick}>
-      <Image
+      <LazyImage
         src={serviceImage.url}
         alt={serviceImage.alt || "alt"}
         sizes={isMobile ? "10vw" : "50vw"}
-        fill
-        className="object-cover object-top overflow-hidden rounded-xl"
+        isFill={true}
+        containerClassName="w-full h-full"
+        imageClassName="object-cover object-top overflow-hidden rounded-xl"
       />
     </div>
   );

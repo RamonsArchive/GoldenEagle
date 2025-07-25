@@ -104,27 +104,27 @@ body {
   @apply hidden transform -translate-y-full;
 }
 
-@utility text-card-title {
+@utility text-card-about-title {
   @apply font-montserrat w-full font-bold italic text-[30px] lg:text-[40px] xl:text-[50px];
 }
 
-@utility text-card-description {
+@utility text-card-about-description {
   @apply font-montserrat text-[16px] lg:text-[18px];
 }
 
-@utility text-card {
+@utility text-card-about {
   @apply flex flex-col w-full p-10 gap-5 bg-slate-900/70 rounded-xl shadow-lg z-10 opacity-0;
 }
 
-@utility image-card {
+@utility image-card-about {
   @apply flex flex-col flex-center w-full p-10 gap-10 bg-slate-900/70 rounded-xl shadow-lg z-10 opacity-0;
 }
 
-@utility before-after-card {
+@utility before-after-card-about {
   @apply flex flex-row w-full p-10 gap-5 bg-slate-900/70 rounded-xl shadow-lg opacity-0;
 }
 
-@utility before-after-card-mobile {
+@utility before-after-card-about-mobile {
   @apply flex flex-col w-full p-10 gap-5 bg-slate-900/70 rounded-xl shadow-lg z-10 opacity-0;
 }
 
