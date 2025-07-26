@@ -62,56 +62,111 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
   });
 
   useGSAP(() => {
-    const beforeAfterCardSection = document.querySelector(
-      beforeAfterCardSectionClassName
-    );
+    if (!isMobile) {
+      const beforeAfterCardSection = document.querySelector(
+        beforeAfterCardSectionClassName
+      );
 
-    if (!beforeAfterCardSection) {
-      console.log("beforeAfterCardSection not found");
-      return;
+      if (!beforeAfterCardSection) {
+        console.log("beforeAfterCardSection not found");
+        return;
+      }
+
+      // Select elements WITHIN the card section (like your original)
+      const beforeImage = beforeAfterCardSection.querySelector("#before-image");
+      const afterImage = beforeAfterCardSection.querySelector("#after-image");
+
+      console.log("beforeImage", beforeImage);
+      console.log("afterImage", afterImage);
+
+      if (!beforeImage || !afterImage) {
+        console.log("Images not found within the card section");
+        return;
+      }
+
+      const beforeAfterTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: beforeAfterCardSection,
+          start: "top 85%",
+          end: "top 55%",
+          scrub: 1,
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      // Don't animate the container - let batch animation handle that
+      // Just animate the images in sequence like your original
+      beforeAfterTl.fromTo(
+        beforeImage,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+      );
+
+      beforeAfterTl.fromTo(
+        afterImage,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        "-=0.3" // This creates the stagger effect
+      );
+      return () => {
+        beforeAfterTl.scrollTrigger?.kill();
+        beforeAfterTl.kill();
+      };
+    } else {
+      // Select elements WITHIN the card section (like your original)
+      console.log(
+        "beforeAfterCardSectionClassName",
+        beforeAfterCardSectionClassName
+      );
+      const beforeAfterCardSection = document.querySelector(
+        beforeAfterCardSectionClassName
+      );
+
+      if (!beforeAfterCardSection) {
+        console.log("beforeAfterCardSection not found");
+        return;
+      }
+      const beforeImage = beforeAfterCardSection.querySelector("#before-image");
+      const afterImage = beforeAfterCardSection.querySelector("#after-image");
+
+      gsap.fromTo(
+        beforeImage,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: beforeImage,
+            start: "top 85%",
+            end: "top 55%",
+            scrub: 1,
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+      gsap.fromTo(
+        afterImage,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: afterImage,
+            start: "top 95%",
+            end: "top 75%",
+            scrub: 1,
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+
+      return () => {
+        gsap.killTweensOf(beforeImage);
+        gsap.killTweensOf(afterImage);
+      };
     }
-
-    // Select elements WITHIN the card section (like your original)
-    const beforeImage = beforeAfterCardSection.querySelector("#before-image");
-    const afterImage = beforeAfterCardSection.querySelector("#after-image");
-
-    console.log("beforeImage", beforeImage);
-    console.log("afterImage", afterImage);
-
-    if (!beforeImage || !afterImage) {
-      console.log("Images not found within the card section");
-      return;
-    }
-
-    const beforeAfterTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: beforeAfterCardSection,
-        start: "top 85%",
-        end: "top 55%",
-        scrub: 1,
-        toggleActions: "play none none reverse",
-      },
-    });
-
-    // Don't animate the container - let batch animation handle that
-    // Just animate the images in sequence like your original
-    beforeAfterTl.fromTo(
-      beforeImage,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
-    );
-
-    beforeAfterTl.fromTo(
-      afterImage,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.3" // This creates the stagger effect
-    );
-
-    return () => {
-      beforeAfterTl.scrollTrigger?.kill();
-      beforeAfterTl.kill();
-    };
   }, []);
 
   return (

@@ -65,7 +65,10 @@ const BeforeAfterCard = ({
           <div className="flex flex-center flex-col w-full">
             <h1 className="text-card-about-title">Before</h1>
           </div>
-          <div className={`relative flex w-full min-h-[300px] ${imageStyles}`}>
+          <div
+            id="before-image"
+            className={`relative flex w-full min-h-[300px] ${imageStyles}`}
+          >
             <LazyImage
               src={beforeImage}
               alt="before"
@@ -99,7 +102,10 @@ const BeforeAfterCard = ({
           <div className="flex flex-center flex-col w-full">
             <h1 className="text-card-about-title">After</h1>
           </div>
-          <div className={`relative flex w-full min-h-[300px] ${imageStyles}`}>
+          <div
+            id="after-image"
+            className={`relative flex w-full min-h-[300px] ${imageStyles}`}
+          >
             <LazyImage
               src={afterImage}
               alt="after"

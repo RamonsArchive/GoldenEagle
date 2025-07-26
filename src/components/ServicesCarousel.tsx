@@ -364,19 +364,6 @@ const ServicesCarousel = ({
     restartAutoRotation();
   };
 
-  useBatchCardAnimation({
-    sectionName: "services-carousel",
-    cardSelectors: [".carousel-container-services-mobile"],
-    textSelectors: {
-      titles: ["text-card-title-services"],
-      descriptions: [
-        "text-card-description-services",
-        "text-card-sub-description-services",
-        "text-card-view-all-photos-services",
-        "text-card-index-services",
-      ],
-    },
-  });
   // // Initialize GSAP settings on mount
   // useGSAP(() => {
   //   // Set initial states for carousel images
@@ -438,7 +425,10 @@ const ServicesCarousel = ({
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-5 w-full p-5">
+        <div
+          id="carousel-text-container-mobile"
+          className="flex flex-col gap-5 w-full p-5"
+        >
           <p
             id="carousel-image-index-mobile"
             className="text-card-index-services"

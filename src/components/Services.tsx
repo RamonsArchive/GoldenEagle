@@ -18,6 +18,7 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
     cardSelectors: [
       ".text-card-services",
       ".carousel-container-services-mobile",
+      "#carousel-text-container-mobile",
     ],
     textSelectors: {
       titles: ["text-card-title-services"],
