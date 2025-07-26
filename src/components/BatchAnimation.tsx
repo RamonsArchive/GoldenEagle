@@ -10,6 +10,7 @@ interface AnimationConfig {
     titles: string[];
     descriptions: string[];
   };
+  imageSelectors?: string[];
   cardAnimation?: {
     startTrigger?: string;
     endTrigger?: string;
@@ -25,6 +26,14 @@ interface AnimationConfig {
     descDuration?: number;
     titleStagger?: number;
     descStagger?: number;
+  };
+  imageAnimation?: {
+    startTrigger?: string;
+    endTrigger?: string;
+    scrub?: number | boolean;
+    duration?: number;
+    ease?: string;
+    imageStagger?: number;
   };
   dependencies?: any[]; // For useGSAP dependency array
 }
@@ -88,8 +97,10 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
     sectionName,
     cardSelectors,
     textSelectors,
+    imageSelectors,
     cardAnimation = {},
     textAnimation = {},
+    imageAnimation = {},
     dependencies = [],
   } = config;
 
@@ -112,6 +123,14 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
       titleStagger = 0.05,
       descStagger = 0.08,
     } = textAnimation;
+
+    const {
+      startTrigger: imageStart = "top 80%",
+      endTrigger: imageEnd = "top 50%",
+      scrub: imageScrub = 1.2,
+      duration: imageDuration = 0.6,
+      ease: imageEase = "power2.out",
+    } = imageAnimation;
 
     // 1. SETUP - Query DOM elements (they exist now)
     const cardElements = cardSelectors
@@ -333,6 +352,42 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
           descDuration,
           descStagger
         );
+      });
+    }
+
+    // animate images
+
+    if (imageSelectors) {
+      // Use cardSelectors to find image cards, not imageSelectors
+      const imageCards = cardElements.filter((element) =>
+        element.className.includes("image-card-about")
+      );
+
+      imageCards.forEach((card) => {
+        // Now use imageSelectors to find the actual image within the card
+        const image = card.querySelector(
+          imageSelectors.join(", ")
+        ) as HTMLElement;
+
+        if (image) {
+          gsap.fromTo(
+            image,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: imageDuration,
+              ease: imageEase,
+              scrollTrigger: {
+                trigger: card,
+                start: imageStart,
+                end: imageEnd,
+                scrub: imageScrub,
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
       });
     }
 

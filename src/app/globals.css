@@ -136,6 +136,14 @@ body {
   @apply relative z-30 rounded-xl shadow-xl border-1 border-white overflow-hidden;
 }
 
+@utility real-image-before-after-about {
+  @apply object-cover object-top w-full h-full overflow-hidden rounded-xl shadow-lg z-10;
+}
+
+@utility real-image-about {
+  @apply object-contain object-top rounded-xl shadow-lg
+}
+
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }

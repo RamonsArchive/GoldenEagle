@@ -16,9 +16,6 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
   const { aboutBackdrop, aboutGallery } = aboutData;
   const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
   const isMobile = window.innerWidth < 768;
-  const beforeAfterCardSection = isMobile
-    ? document.querySelector(".before-after-card-about-mobile")
-    : document.querySelector(".before-after-card-about");
   const beforeAfterCardSectionClassName = isMobile
     ? ".before-after-card-about-mobile"
     : ".before-after-card-about";
@@ -45,6 +42,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       titles: [".text-card-about-title"],
       descriptions: [".text-card-about-description"],
     },
+    imageSelectors: [".image-container-about"],
     cardAnimation: {
       startTrigger: "top 90%",
       endTrigger: "top 60%",
@@ -62,6 +60,59 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       descStagger: 0.08,
     },
   });
+
+  useGSAP(() => {
+    const beforeAfterCardSection = document.querySelector(
+      beforeAfterCardSectionClassName
+    );
+
+    if (!beforeAfterCardSection) {
+      console.log("beforeAfterCardSection not found");
+      return;
+    }
+
+    // Select elements WITHIN the card section (like your original)
+    const beforeImage = beforeAfterCardSection.querySelector("#before-image");
+    const afterImage = beforeAfterCardSection.querySelector("#after-image");
+
+    console.log("beforeImage", beforeImage);
+    console.log("afterImage", afterImage);
+
+    if (!beforeImage || !afterImage) {
+      console.log("Images not found within the card section");
+      return;
+    }
+
+    const beforeAfterTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: beforeAfterCardSection,
+        start: "top 85%",
+        end: "top 55%",
+        scrub: 1,
+        toggleActions: "play none none reverse",
+      },
+    });
+
+    // Don't animate the container - let batch animation handle that
+    // Just animate the images in sequence like your original
+    beforeAfterTl.fromTo(
+      beforeImage,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+    );
+
+    beforeAfterTl.fromTo(
+      afterImage,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+      "-=0.3" // This creates the stagger effect
+    );
+
+    return () => {
+      beforeAfterTl.scrollTrigger?.kill();
+      beforeAfterTl.kill();
+    };
+  }, []);
 
   // useGSAP(() => {
   //   // 1. INITIAL SETUP - Set cards to invisible and offset
@@ -385,7 +436,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
               Meet the <span className="text-primary-400">Aguilar's</span>
             </h1>
             <div
-              className="image-container relative flex flex-center w-full"
+              className="image-container-about relative flex flex-center w-full"
               style={{
                 aspectRatio: imageAspectRatio ? imageAspectRatio : "4/3",
               }}
@@ -396,7 +447,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
                 width={500}
                 height={400}
                 containerClassName="w-full h-full"
-                imageClassName="object-contain object-top rounded-xl shadow-lg"
+                imageClassName="real-image-about"
               />
             </div>
           </div>
@@ -407,6 +458,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
             beforeImage={aboutGallery[2].url}
             afterImage={aboutGallery[1].url}
             imageStyles="h-[250px] sm:h-[300px] w-full rounded-xl shadow-lg"
+            imageClassName="real-image-before-after-about"
             isMobile={true}
           />
 
@@ -530,12 +582,12 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
       </div>
 
       <div className="hidden md:flex flex-1 flex-col gap-10 items-start p-10">
-        <div className="image-card flex flex-col w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
+        <div className="image-card-about flex flex-col w-full p-10 gap-10 bg-slate-900/60 rounded-xl shadow-lg z-10">
           <h1 className="text-card-about-title">
             Meet the <span className="text-primary-400">Aguilar's</span>
           </h1>
           <div
-            className="image-container relative flex w-full"
+            className="image-container-about relative flex w-full"
             style={{
               aspectRatio: imageAspectRatio ? imageAspectRatio : "4/3",
             }}
@@ -546,7 +598,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
               width={1000}
               height={800}
               containerClassName="w-full h-full"
-              imageClassName="object-contain object-top rounded-xl shadow-lg"
+              imageClassName="real-image-about"
             />
           </div>
         </div>
@@ -557,6 +609,7 @@ const About = ({ aboutData }: { aboutData: AboutData }) => {
           beforeImage={aboutGallery[2].url}
           afterImage={aboutGallery[1].url}
           imageStyles="h-[300px] lg:h-[400px] w-full rounded-xl shadow-lg"
+          imageClassName="real-image-before-after-about"
         />
       </div>
     </main>

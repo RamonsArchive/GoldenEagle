@@ -9,6 +9,7 @@ const BeforeAfterCard = ({
   beforeImage,
   afterImage,
   imageStyles,
+  imageClassName,
   isMobile = false,
 }: {
   id: string;
@@ -16,6 +17,7 @@ const BeforeAfterCard = ({
   beforeImage: string;
   afterImage: string;
   imageStyles: string;
+  imageClassName?: string;
   isMobile?: boolean;
 }) => {
   return (
@@ -35,7 +37,7 @@ const BeforeAfterCard = ({
               sizes={`${isMobile ? "70vw" : "50vw"}`}
               isFill={true}
               containerClassName="w-full h-full"
-              imageClassName="object-cover object-top rounded-xl shadow-lg z-10"
+              imageClassName={`${imageClassName}`}
             />
           </div>
         </div>
@@ -53,7 +55,7 @@ const BeforeAfterCard = ({
               sizes={`${isMobile ? "70vw" : "50vw"}`}
               isFill={true}
               containerClassName="w-full h-full"
-              imageClassName="object-cover object-top rounded-xl shadow-lg"
+              imageClassName={`${imageClassName}`}
             />
           </div>
         </div>
@@ -70,7 +72,7 @@ const BeforeAfterCard = ({
               sizes={`${isMobile ? "70vw" : "50vw"}`}
               isFill={true}
               containerClassName="w-full h-full"
-              imageClassName="object-cover object-top rounded-xl shadow-lg"
+              imageClassName={`${imageClassName}`}
             />
           </div>
         </div>
@@ -104,7 +106,7 @@ const BeforeAfterCard = ({
               sizes={`${isMobile ? "70vw" : "50vw"}`}
               isFill={true}
               containerClassName="w-full h-full"
-              imageClassName="object-cover object-top rounded-xl shadow-lg"
+              imageClassName={`${imageClassName}`}
             />
           </div>
         </div>
