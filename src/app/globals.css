@@ -112,15 +112,24 @@ body {
   @apply font-montserrat text-[16px] lg:text-[18px];
 }
 
-@utility text-card-index-services {
+@utility text-card-title-carousel-services {
+  @apply font-montserrat w-full font-bold italic text-[30px] lg:text-[40px] xl:text-[50px];
+}
+
+@utility text-card-description-carousel-services {
+  @apply font-montserrat text-[16px] lg:text-[18px];
+}
+
+
+@utility text-card-index-carousel-services {
   @apply font-montserrat text-[12px] text-white/80;
 }
 
-@utility text-card-sub-description-services {
+@utility text-card-sub-description-carousel-services {
   @apply font-montserrat font-light italic text-[12px] text-white/80;
 }
 
-@utility text-card-view-all-photos-services {
+@utility text-card-view-all-photos-carousel-services {
   @apply font-montserrat font-normal italic underline text-[12px] text-white/80 cursor-pointer hover:text-gray-200  active:text-gray-200 transition-all;
 } 
 

@@ -15,19 +15,10 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
 
   useBatchCardAnimation({
     sectionName: "services",
-    cardSelectors: [
-      ".text-card-services",
-      ".carousel-container-services-mobile",
-      "#carousel-text-container-mobile",
-    ],
+    cardSelectors: [".text-card-services"],
     textSelectors: {
-      titles: ["text-card-title-services"],
-      descriptions: [
-        "text-card-description-services",
-        "text-card-sub-description-services",
-        "text-card-view-all-photos-services",
-        "text-card-index-services",
-      ],
+      titles: [".text-card-title-services"],
+      descriptions: [".text-card-description-services"],
     },
   });
 

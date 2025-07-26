@@ -43,13 +43,16 @@ const animateText = (
   textStart: string,
   textEnd: string,
   scrub: number | boolean,
-  titleSplit?: SplitText,
+  titleSplit?: SplitText | null,
   titleDuration?: number,
   titleStagger?: number,
-  descSplit?: SplitText,
+  descSplit?: SplitText | null,
   descDuration?: number,
   descStagger?: number
 ) => {
+  console.log([`Animating [${card.className}]`]);
+  console.log(`animating titleSplit`, titleSplit);
+  console.log(`animating descSplit`, descSplit);
   const textTl = gsap.timeline({
     scrollTrigger: {
       trigger: card,
@@ -153,55 +156,7 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
       y: 50,
     });
 
-    // 2. HANDLE TEXT ANIMATIONS IF SPECIFIED
-    let titleSplits: SplitText[] = [];
-    let descriptionSplits: SplitText[] = [];
-
-    if (textSelectors) {
-      // Query text elements
-      const titleElements = Array.from(
-        document.querySelectorAll(textSelectors.titles.join(", "))
-      ) as HTMLElement[];
-
-      const descriptionElements = Array.from(
-        document.querySelectorAll(textSelectors.descriptions.join(", "))
-      ) as HTMLElement[];
-
-      console.log(`[${sectionName}] Title elements:`, titleElements);
-      console.log(
-        `[${sectionName}] Description elements:`,
-        descriptionElements
-      );
-
-      // Create SplitText instances for titles
-      titleElements.forEach((titleEl) => {
-        const split = new SplitText(titleEl, { type: "words" });
-        titleSplits.push(split);
-        gsap.set(split.words, {
-          opacity: 0,
-          y: 30,
-        });
-      });
-
-      // Create SplitText instances for descriptions
-      descriptionElements.forEach((descEl) => {
-        const split = new SplitText(descEl, { type: "lines" });
-        descriptionSplits.push(split);
-        gsap.set(split.lines, {
-          opacity: 0,
-          y: 20,
-        });
-      });
-
-      console.log(
-        `[${sectionName}] Created ${titleSplits.length} title splits`
-      );
-      console.log(
-        `[${sectionName}] Created ${descriptionSplits.length} description splits`
-      );
-    }
-
-    // 3. ANIMATE CARDS (Batch approach for performance)
+    // 2. ANIMATE CARDS (Batch approach for performance)
     ScrollTrigger.batch(cardElements, {
       onEnter: (elements) => {
         elements.forEach((element) => {
@@ -222,140 +177,128 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
       },
     });
 
-    // 4. ANIMATE TEXT CONTENT
-    if (textSelectors && titleSplits.length > 0) {
-      // Find all text cards for this section
-      const textCards = cardElements.filter((element) =>
-        element.classList.toString().includes("text-card")
-      );
+    // 3. ANIMATE TEXT CONTENT
+    // Replace your text animation section with this improved logic:
 
-      const imageCards = cardElements.filter((element) =>
-        element.className.toString().includes("image-card")
-      );
+    let titleSplitMap = new Map<HTMLElement, SplitText>();
+    let descSplitMap = new Map<HTMLElement, SplitText>();
 
-      const beforeAfterCards = cardElements.filter((element) =>
-        element.className.toString().includes("before-after-card")
-      );
+    // During SplitText creation, store the mapping
+    if (textSelectors) {
+      cardElements.forEach((card, cardIndex) => {
+        const titleElements = Array.from(
+          card.querySelectorAll(textSelectors.titles.join(", "))
+        ) as HTMLElement[];
 
-      const textToAnimate = [...textCards, ...imageCards, ...beforeAfterCards];
+        const descriptionElements = Array.from(
+          card.querySelectorAll(textSelectors.descriptions.join(", "))
+        ) as HTMLElement[];
 
-      textToAnimate.forEach((card) => {
-        const isBeforeAfterCard = card.className
-          .toString()
-          .includes("before-after-card");
-        // Find text elements within this specific card
-        let titleInCard: HTMLElement | null | NodeListOf<HTMLElement> = null;
-        let descInCard: HTMLElement | null | NodeListOf<HTMLElement> = null;
-
-        if (isBeforeAfterCard) {
-          console.log("before-after-card");
-          titleInCard = card.querySelectorAll(
-            textSelectors.titles.join(", ")
-          ) as NodeListOf<HTMLElement>;
-          console.log("titleInCard", titleInCard);
-
-          descInCard = card.querySelectorAll(
-            textSelectors.descriptions.join(", ")
-          ) as NodeListOf<HTMLElement>;
-        } else {
-          titleInCard = card.querySelector(
-            textSelectors.titles.join(", ")
-          ) as HTMLElement;
-          console.log("titleInCard", titleInCard);
-          descInCard = card.querySelector(
-            textSelectors.descriptions.join(", ")
-          ) as HTMLElement;
-
-          if (!titleInCard && !descInCard) return;
-        }
-
-        // Find corresponding SplitText instances
-        let titleSplit: SplitText | null = null;
-        let descSplit: SplitText | null = null;
-
-        // Match title element to its SplitText instance
-        if (titleInCard) {
-          const titleElements = Array.from(
-            document.querySelectorAll(textSelectors.titles.join(", "))
-          ) as HTMLElement[];
-          if (isBeforeAfterCard) {
-            console.log("titleInCard is an array");
-            (titleInCard as NodeListOf<HTMLElement>).forEach((title) => {
-              const titleIndex = titleElements.findIndex((el) => el === title);
-              if (titleIndex !== -1 && titleSplits[titleIndex]) {
-                titleSplit = titleSplits[titleIndex];
-                animateText(
-                  card,
-                  textStart,
-                  textEnd,
-                  scrub,
-                  titleSplit as SplitText,
-                  titleDuration,
-                  titleStagger,
-                  descSplit as SplitText,
-                  descDuration,
-                  descStagger
-                );
-              }
+        // Create SplitText instances for titles and store mapping
+        titleElements.forEach((titleEl, titleIndex) => {
+          try {
+            const split = new SplitText(titleEl, { type: "words" });
+            titleSplitMap.set(titleEl, split); // Store the relationship
+            gsap.set(split.words, {
+              opacity: 0,
+              y: 30,
             });
-          } else {
-            const titleIndex = titleElements.findIndex(
-              (el) => el === titleInCard
+          } catch (error) {
+            console.error(
+              `[${sectionName}] Error creating title split:`,
+              error
             );
-            if (titleIndex !== -1 && titleSplits[titleIndex]) {
-              titleSplit = titleSplits[titleIndex];
-            }
           }
-        }
+        });
 
-        // Match description element to its SplitText instance
-        if (descInCard) {
-          const descElements = Array.from(
-            document.querySelectorAll(textSelectors.descriptions.join(", "))
-          ) as HTMLElement[];
-          if (isBeforeAfterCard) {
-            (descInCard as NodeListOf<HTMLElement>).forEach((desc) => {
-              const descIndex = descElements.findIndex((el) => el === desc);
-              if (descIndex !== -1 && descriptionSplits[descIndex]) {
-                descSplit = descriptionSplits[descIndex];
-                animateText(
-                  card,
-                  textStart,
-                  textEnd,
-                  scrub,
-                  titleSplit as SplitText,
-                  titleDuration,
-                  titleStagger,
-                  descSplit as SplitText,
-                  descDuration,
-                  descStagger
-                );
-              }
+        // Create SplitText instances for descriptions and store mapping
+        descriptionElements.forEach((descEl) => {
+          try {
+            const split = new SplitText(descEl, { type: "lines" });
+            descSplitMap.set(descEl, split); // Store the relationship
+            gsap.set(split.lines, {
+              opacity: 0,
+              y: 20,
             });
-          } else {
-            const descIndex = descElements.findIndex((el) => el === descInCard);
-            if (descIndex !== -1 && descriptionSplits[descIndex]) {
-              descSplit = descriptionSplits[descIndex];
-            }
+          } catch (error) {
+            console.error(`[${sectionName}] Error creating desc split:`, error);
+          }
+        });
+      });
+
+      // Now animate each card's text using the maps
+      cardElements.forEach((card, cardIndex) => {
+        const titleElementsInCard = Array.from(
+          card.querySelectorAll(textSelectors.titles.join(", "))
+        ) as HTMLElement[];
+
+        const descElementsInCard = Array.from(
+          card.querySelectorAll(textSelectors.descriptions.join(", "))
+        ) as HTMLElement[];
+
+        // Get splits for this card using the maps
+        const cardTitleSplits = titleElementsInCard
+          .map((titleEl) => titleSplitMap.get(titleEl))
+          .filter(Boolean) as SplitText[];
+
+        const cardDescSplits = descElementsInCard
+          .map((descEl) => descSplitMap.get(descEl))
+          .filter(Boolean) as SplitText[];
+
+        console.log(
+          `[${sectionName}] Card ${cardIndex} - Title splits:`,
+          cardTitleSplits.length
+        );
+        console.log(
+          `[${sectionName}] Card ${cardIndex} - Description splits:`,
+          cardDescSplits.length
+        );
+
+        // Only create timeline if we have splits to animate
+        if (cardTitleSplits.length > 0 || cardDescSplits.length > 0) {
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: textStart,
+              end: textEnd,
+              scrub: scrub,
+              toggleActions: "play none none reverse",
+            },
+          });
+
+          // Animate titles if they exist
+          if (cardTitleSplits.length > 0) {
+            timeline.to(
+              cardTitleSplits.flatMap((split) => split.words),
+              {
+                opacity: 1,
+                y: 0,
+                duration: titleDuration,
+                stagger: titleStagger,
+                ease: "power2.out",
+              }
+            );
+          }
+
+          // Animate descriptions if they exist
+          if (cardDescSplits.length > 0) {
+            timeline.to(
+              cardDescSplits.flatMap((split) => split.lines),
+              {
+                opacity: 1,
+                y: 0,
+                duration: descDuration,
+                stagger: descStagger,
+                ease: "power2.out",
+              },
+              cardTitleSplits.length > 0 ? "-=0.4" : "0" // Only offset if titles exist
+            );
           }
         }
-
-        animateText(
-          card,
-          textStart,
-          textEnd,
-          scrub,
-          titleSplit as SplitText,
-          titleDuration,
-          titleStagger,
-          descSplit as SplitText,
-          descDuration,
-          descStagger
-        );
       });
     }
 
-    // animate images
+    // 4. ANIMATE IMAGES
 
     if (imageSelectors) {
       // Use cardSelectors to find image cards, not imageSelectors
@@ -407,8 +350,8 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
       });
 
       // Revert SplitText instances
-      titleSplits.forEach((split) => split.revert());
-      descriptionSplits.forEach((split) => split.revert());
+      titleSplitMap.forEach((split) => split.revert());
+      descSplitMap.forEach((split) => split.revert());
     };
   }, [sectionName, ...dependencies]);
 };
