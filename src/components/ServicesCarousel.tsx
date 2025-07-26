@@ -153,39 +153,6 @@ const ServicesCarousel = ({
     }
   };
 
-  useEffect(() => {
-    if (splitTitleTextRef.current.length > 0) {
-      // Content has changed, refresh the SplitText instances
-      const titleCards = document.querySelectorAll(
-        "#carousel-text-card-container-mobile .text-card-title-services"
-      );
-      const descriptionCards = document.querySelectorAll(
-        "#carousel-text-card-container-mobile .text-card-description-services, #carousel-text-card-container-mobile .text-card-sub-description-services, #carousel-text-card-container-mobile .text-card-view-all-photos-services, #carousel-text-card-container-mobile .text-card-index-services"
-      );
-
-      // Refresh SplitText with new content
-      titleCards.forEach((card, index) => {
-        if (splitTitleTextRef.current[index]) {
-          splitTitleTextRef.current[index].split({ type: "words" });
-          gsap.set(splitTitleTextRef.current[index].words, {
-            opacity: 0,
-            y: 30,
-          });
-        }
-      });
-
-      descriptionCards.forEach((card, index) => {
-        if (splitDescriptionTextRef.current[index]) {
-          splitDescriptionTextRef.current[index].split({ type: "lines" });
-          gsap.set(splitDescriptionTextRef.current[index].lines, {
-            opacity: 0,
-            y: 30,
-          });
-        }
-      });
-    }
-  }, [serviceCurrentImage]); // Re-run when content changes
-
   // // Initialize GSAP settings on mount
   useGSAP(() => {
     const localImageCard = document.querySelector(
@@ -525,6 +492,39 @@ const ServicesCarousel = ({
     },
     [currentIndex, calculateImageIndex]
   );
+
+  useEffect(() => {
+    if (splitTitleTextRef.current.length > 0) {
+      // Content has changed, refresh the SplitText instances
+      const titleCards = document.querySelectorAll(
+        "#carousel-text-card-container-mobile .text-card-carousel-title-services"
+      );
+      const descriptionCards = document.querySelectorAll(
+        "#carousel-text-card-container-mobile .text-card-carousel-description-services, #carousel-text-card-container-mobile .text-card-carousel-sub-description-services, #carousel-text-card-container-mobile .text-card-carousel-view-all-photos-services, #carousel-text-card-container-mobile .text-card-carousel-index-services"
+      );
+
+      // Refresh SplitText with new content
+      titleCards.forEach((card, index) => {
+        if (splitTitleTextRef.current[index]) {
+          splitTitleTextRef.current[index].split({ type: "words" });
+          gsap.set(splitTitleTextRef.current[index].words, {
+            opacity: 0,
+            y: 30,
+          });
+        }
+      });
+
+      descriptionCards.forEach((card, index) => {
+        if (splitDescriptionTextRef.current[index]) {
+          splitDescriptionTextRef.current[index].split({ type: "lines" });
+          gsap.set(splitDescriptionTextRef.current[index].lines, {
+            opacity: 0,
+            y: 30,
+          });
+        }
+      });
+    }
+  }, [serviceCurrentImage]); // Re-run when content changes
 
   const handleArrowClick = (direction: "left" | "right") => {
     handleImageTransition(direction);
