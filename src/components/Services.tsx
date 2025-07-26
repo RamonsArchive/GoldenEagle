@@ -5,12 +5,30 @@ import React from "react";
 import TextCard from "./TextCard";
 import ServicesCarousel from "./ServicesCarousel";
 import LazyImage from "./LazyImage";
+import { useBatchCardAnimation } from "./BatchAnimation";
 
 const Services = ({ servicesData }: { servicesData: ServicesData }) => {
   const { servicesBackdrop, awsServicesImages } = servicesData;
 
   console.log("This is the services data", servicesData);
   console.log("This is the services backdrop", servicesBackdrop);
+
+  useBatchCardAnimation({
+    sectionName: "services",
+    cardSelectors: [
+      ".text-card-services",
+      ".carousel-container-services-mobile",
+    ],
+    textSelectors: {
+      titles: ["text-card-title-services"],
+      descriptions: [
+        "text-card-description-services",
+        "text-card-sub-description-services",
+        "text-card-view-all-photos-services",
+        "text-card-index-services",
+      ],
+    },
+  });
 
   return (
     <main
@@ -34,6 +52,7 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
       <div className="flex flex-col md:hidden w-full h-full p-5 gap-10">
         <TextCard
           id="services-mobile"
+          className="text-card-services"
           title="Services"
           description={
             <>
@@ -42,14 +61,11 @@ const Services = ({ servicesData }: { servicesData: ServicesData }) => {
               project too big, no detail too small.
             </>
           }
-          titleStyle="text-card-title z-20"
-          descriptionStyle="text-card-description z-20"
+          titleStyle="text-card-title-services z-25"
+          descriptionStyle="text-card-description-services z-25"
         />
 
-        <div className="flex flex-col w-full h-full gap-5">
-          <div className="flex flex-col w-full h-full gap-5"></div>
-        </div>
-        {<ServicesCarousel servicesData={servicesData} />}
+        <ServicesCarousel servicesData={servicesData} />
       </div>
     </main>
   );

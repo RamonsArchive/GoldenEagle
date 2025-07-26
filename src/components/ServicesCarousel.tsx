@@ -16,6 +16,7 @@ import LeftCarouselImage from "./LeftCarouselImage";
 import RightCarouselImage from "./RightCarouselImage";
 import CenterCarouselImage from "./CenterCarouselImage";
 import LazyImage from "./LazyImage";
+import { useBatchCardAnimation } from "./BatchAnimation";
 
 // EXACT position calculations based on your layout:
 // Container: 200px wide
@@ -188,7 +189,7 @@ const ServicesCarousel = ({
           // Fade main image back in
           gsap.to("#carousel-main-image-mobile", {
             opacity: 1,
-            duration: 0.3,
+            duration: 0.4,
             ease: "power2.inOut",
           });
 
@@ -363,19 +364,32 @@ const ServicesCarousel = ({
     restartAutoRotation();
   };
 
-  // Initialize GSAP settings on mount
-  useGSAP(() => {
-    // Set initial states for carousel images
-    gsap.set("#left-carousel-image-mobile", { scale: 1 });
-    gsap.set("#center-carousel-image-mobile", { scale: 1.2 });
-    gsap.set("#right-carousel-image-mobile", { scale: 1 });
-  }, []);
+  useBatchCardAnimation({
+    sectionName: "services-carousel",
+    cardSelectors: [".carousel-container-services-mobile"],
+    textSelectors: {
+      titles: ["text-card-title-services"],
+      descriptions: [
+        "text-card-description-services",
+        "text-card-sub-description-services",
+        "text-card-view-all-photos-services",
+        "text-card-index-services",
+      ],
+    },
+  });
+  // // Initialize GSAP settings on mount
+  // useGSAP(() => {
+  //   // Set initial states for carousel images
+  //   gsap.set("#left-carousel-image-mobile", { scale: 1 });
+  //   gsap.set("#center-carousel-image-mobile", { scale: 1.2 });
+  //   gsap.set("#right-carousel-image-mobile", { scale: 1 });
+  // }, []);
 
   return (
     <>
       <div
         id="mobile-service-container"
-        className="flex flex-col xs:hidden w-full h-full gap-5 bg-slate-900/70 rounded-xl"
+        className="carousel-container-services-mobile"
       >
         <div className="relative flex flex-col w-full h-[60vh] z-20">
           <LazyImage
@@ -427,7 +441,7 @@ const ServicesCarousel = ({
         <div className="flex flex-col gap-5 w-full p-5">
           <p
             id="carousel-image-index-mobile"
-            className="font-montserrat text-[12px] text-white/80"
+            className="text-card-index-services"
           >
             {currentIndex + 1} of {carouselImages.length} images
           </p>
@@ -437,19 +451,19 @@ const ServicesCarousel = ({
           >
             <h1
               id="carousel-image-title-mobile"
-              className="font-montserrat font-bold text-[24px] text-white"
+              className="text-card-title-services"
             >
               {serviceCurrentImage?.title}
             </h1>
             <h2
               id="carousel-image-description-mobile"
-              className="font-montserrat font-regular text-[16px] text-white/90"
+              className="text-card-description-services"
             >
               {serviceCurrentImage?.description}
             </h2>
             <p
               id="carousel-image-sub-description-mobile"
-              className="font-montserrat font-light italic text-[12px] text-white/70"
+              className="text-card-sub-description-services"
             >
               {serviceCurrentImage?.subDescription}
             </p>
@@ -457,7 +471,7 @@ const ServicesCarousel = ({
           <div className="flex justify-end">
             <p
               id="carousel-image-view-all-photos-mobile"
-              className="font-montserrat font-regular italic underline text-[12px] text-white/80 cursor-pointer hover:text-white transition-colors"
+              className="text-card-view-all-photos-services"
             >
               View all photos
             </p>
