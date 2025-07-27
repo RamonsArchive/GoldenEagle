@@ -5,13 +5,15 @@ import LazyImage from "./LazyImage";
 
 const LeftCarouselImage = ({
   id,
-  serviceImage,
+  imageURL,
+  imageAlt,
   styles,
   onClick,
   isMobile = false,
 }: {
   id: string;
-  serviceImage: ServiceImageType;
+  imageURL: string;
+  imageAlt: string;
   styles: string;
   onClick: () => void;
   isMobile?: boolean;
@@ -19,8 +21,8 @@ const LeftCarouselImage = ({
   return (
     <div id={id} className={`${styles}`} onClick={onClick}>
       <LazyImage
-        src={serviceImage.url}
-        alt={serviceImage.alt || "alt"}
+        src={imageURL}
+        alt={imageAlt || "alt"}
         sizes={isMobile ? "10vw" : "50vw"}
         isFill={true}
         containerClassName="w-full h-full"

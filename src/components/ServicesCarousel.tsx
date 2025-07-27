@@ -77,6 +77,7 @@ const ServicesCarousel = ({
   const isAnimatingRef = useRef(false);
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
   const carouselImages = useMemo(() => {
     const allImages: ServiceImageType[] = [];
@@ -100,17 +101,43 @@ const ServicesCarousel = ({
     return (index + carouselImages.length) % carouselImages.length;
   };
 
-  const currentImage = carouselImages[currentIndex];
-  const prevImage = carouselImages[calculateImageIndex(currentIndex - 1)];
-  const nextImage = carouselImages[calculateImageIndex(currentIndex + 1)];
+  const currentServiceData = useMemo(() => {
+    const calculateImageIndex = (index: number) => {
+      return (index + carouselImages.length) % carouselImages.length;
+    };
 
-  const categoryCurrentImage = currentImage.category;
-  const categoryPrevImage = prevImage.category;
-  const categoryNextImage = nextImage.category;
+    const currentImage = carouselImages[currentIndex];
+    const prevImage = carouselImages[calculateImageIndex(currentIndex - 1)];
+    const nextImage = carouselImages[calculateImageIndex(currentIndex + 1)];
 
-  const serviceCurrentImage = serviceDescriptions.get(categoryCurrentImage);
-  const servicePrevImage = serviceDescriptions.get(categoryPrevImage);
-  const serviceNextImage = serviceDescriptions.get(categoryNextImage);
+    const currentImageData = serviceDescriptions.get(currentImage.category);
+    const prevImageData = serviceDescriptions.get(prevImage.category);
+    const nextImageData = serviceDescriptions.get(nextImage.category);
+
+    return {
+      current: {
+        image: currentImage.url,
+        alt: currentImage.alt,
+        title: currentImageData?.title,
+        description: currentImageData?.description,
+        subDescription: currentImageData?.subDescription,
+      },
+      prev: {
+        image: prevImage.url,
+        alt: prevImage.alt,
+        title: prevImageData?.title,
+        description: prevImageData?.description,
+        subDescription: prevImageData?.subDescription,
+      },
+      next: {
+        image: nextImage.url,
+        alt: nextImage.alt,
+        title: nextImageData?.title,
+        description: nextImageData?.description,
+        subDescription: nextImageData?.subDescription,
+      },
+    };
+  }, [currentIndex, carouselImages]);
 
   const splitTitleTextRef = useRef<SplitText[]>([]);
   const splitDescriptionTextRef = useRef<SplitText[]>([]);
@@ -205,15 +232,55 @@ const ServicesCarousel = ({
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: "#carousel-image-description-mobile",
-        start: "top 90%",
-        end: "bottom 85%",
+        start: "top 99%",
+        end: "bottom 90%",
         scrub: 1,
         toggleActions: "play none none reverse",
+        markers: true,
+        onUpdate: (self) => {
+          // Store the scroll progress for manual animations
+          scrollTriggerRef.current = self;
+        },
       },
     });
 
     animateTextIn(tl);
   }, []);
+
+  // Function to get current scroll progress and animate to that state
+  const animateToScrollState = (timeline: gsap.core.Timeline) => {
+    console.log("current index in animateToScrollState", currentIndex);
+    console.log("cateogry of current image", currentServiceData.current.title);
+    const progress = scrollTriggerRef.current?.progress || 0;
+
+    for (const title of splitTitleTextRef.current) {
+      timeline.to(
+        title.words,
+        {
+          opacity: progress,
+          y: 30 * (1 - progress),
+          ease: "power2.inOut",
+          duration: 0.6,
+          stagger: 0.05,
+        },
+        "<0.1"
+      );
+    }
+
+    for (const description of splitDescriptionTextRef.current) {
+      timeline.to(
+        description.lines,
+        {
+          opacity: progress,
+          y: 30 * (1 - progress),
+          ease: "power2.inOut",
+          duration: 0.6,
+          stagger: 0.08,
+        },
+        "<0.1"
+      );
+    }
+  };
 
   // Function to animate text out (for transitions)
   const animateTextOut = (timeline: gsap.core.Timeline) => {
@@ -323,9 +390,9 @@ const ServicesCarousel = ({
           });
 
           const textInTl = gsap.timeline();
-          animateTextIn(textInTl);
+          animateToScrollState(textInTl);
 
-          /// text animations next
+          // text animations next
         },
       });
 
@@ -493,39 +560,6 @@ const ServicesCarousel = ({
     [currentIndex, calculateImageIndex]
   );
 
-  useEffect(() => {
-    if (splitTitleTextRef.current.length > 0) {
-      // Content has changed, refresh the SplitText instances
-      const titleCards = document.querySelectorAll(
-        "#carousel-text-card-container-mobile .text-card-carousel-title-services"
-      );
-      const descriptionCards = document.querySelectorAll(
-        "#carousel-text-card-container-mobile .text-card-carousel-description-services, #carousel-text-card-container-mobile .text-card-carousel-sub-description-services, #carousel-text-card-container-mobile .text-card-carousel-view-all-photos-services, #carousel-text-card-container-mobile .text-card-carousel-index-services"
-      );
-
-      // Refresh SplitText with new content
-      titleCards.forEach((card, index) => {
-        if (splitTitleTextRef.current[index]) {
-          splitTitleTextRef.current[index].split({ type: "words" });
-          gsap.set(splitTitleTextRef.current[index].words, {
-            opacity: 0,
-            y: 30,
-          });
-        }
-      });
-
-      descriptionCards.forEach((card, index) => {
-        if (splitDescriptionTextRef.current[index]) {
-          splitDescriptionTextRef.current[index].split({ type: "lines" });
-          gsap.set(splitDescriptionTextRef.current[index].lines, {
-            opacity: 0,
-            y: 30,
-          });
-        }
-      });
-    }
-  }, [serviceCurrentImage]); // Re-run when content changes
-
   const handleArrowClick = (direction: "left" | "right") => {
     handleImageTransition(direction);
     restartAutoRotation();
@@ -554,7 +588,8 @@ const ServicesCarousel = ({
               <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20 rounded-xl">
                 <LeftCarouselImage
                   id="left-carousel-image-mobile"
-                  serviceImage={prevImage}
+                  imageURL={currentServiceData.prev.image}
+                  imageAlt={currentServiceData.prev.alt || "alt"}
                   styles="carousel-side-image-mobile cursor-pointer w-[30px] h-[50px]"
                   onClick={() => handleArrowClick("left")}
                   isMobile={true}
@@ -565,7 +600,8 @@ const ServicesCarousel = ({
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 rounded-xl">
                 <CenterCarouselImage
                   id="center-carousel-image-mobile"
-                  serviceImage={currentImage}
+                  imageURL={currentServiceData.current.image}
+                  imageAlt={currentServiceData.current.alt || "alt"}
                   styles="carousel-side-image-mobile w-[36px] h-[60px]" // 1.2x scale built in
                   isMobile={true}
                 />
@@ -575,7 +611,8 @@ const ServicesCarousel = ({
               <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 rounded-xl">
                 <RightCarouselImage
                   id="right-carousel-image-mobile"
-                  serviceImage={nextImage}
+                  imageURL={currentServiceData.next.image}
+                  imageAlt={currentServiceData.next.alt || "alt"}
                   styles="carousel-side-image-mobile cursor-pointer w-[30px] h-[50px]"
                   onClick={() => handleArrowClick("right")}
                   isMobile={true}
@@ -602,19 +639,19 @@ const ServicesCarousel = ({
               id="carousel-image-title-mobile"
               className="text-card-title-carousel-services"
             >
-              {serviceCurrentImage?.title}
+              {currentServiceData.current.title}
             </h1>
             <h2
               id="carousel-image-description-mobile"
               className="text-card-description-carousel-services"
             >
-              {serviceCurrentImage?.description}
+              {currentServiceData.current.description}
             </h2>
             <p
               id="carousel-image-sub-description-mobile"
               className="text-card-sub-description-carousel-services"
             >
-              {serviceCurrentImage?.subDescription}
+              {currentServiceData.current.subDescription}
             </p>
           </div>
           <div className="flex justify-end">

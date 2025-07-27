@@ -5,20 +5,22 @@ import LazyImage from "./LazyImage";
 
 const CenterCarouselImage = ({
   id,
-  serviceImage,
+  imageURL,
+  imageAlt,
   styles,
   isMobile = false,
 }: {
   id: string;
-  serviceImage: ServiceImageType;
+  imageURL: string;
+  imageAlt: string;
   styles: string;
   isMobile?: boolean;
 }) => {
   return (
     <div id={id} className={`${styles}`}>
       <LazyImage
-        src={serviceImage.url}
-        alt={serviceImage.alt || "alt"}
+        src={imageURL}
+        alt={imageAlt || "alt"}
         sizes={isMobile ? "10vw" : "50vw"}
         isFill={true}
         containerClassName="w-full h-full"
