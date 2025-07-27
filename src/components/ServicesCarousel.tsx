@@ -227,6 +227,15 @@ const ServicesCarousel = ({
 
     console.log("splitTitleText", splitTitleTextRef.current);
     console.log("splitDescriptionText", splitDescriptionTextRef.current);
+    console.log("currentServiceData title", currentServiceData.current.title);
+    console.log(
+      "currentServiceData description",
+      currentServiceData.current.description
+    );
+    console.log(
+      "currentServiceData subDescription",
+      currentServiceData.current.subDescription
+    );
 
     // Initial scroll-triggered animation
     const tl = gsap.timeline({
@@ -245,7 +254,7 @@ const ServicesCarousel = ({
     });
 
     animateTextIn(tl);
-  }, []);
+  }, [currentServiceData]);
 
   // Function to get current scroll progress and animate to that state
   const animateToScrollState = (timeline: gsap.core.Timeline) => {
@@ -254,8 +263,12 @@ const ServicesCarousel = ({
     const progress = scrollTriggerRef.current?.progress || 0;
 
     for (const title of splitTitleTextRef.current) {
-      timeline.to(
+      timeline.fromTo(
         title.words,
+        {
+          opacity: 0,
+          y: 30,
+        },
         {
           opacity: progress,
           y: 30 * (1 - progress),
@@ -268,8 +281,12 @@ const ServicesCarousel = ({
     }
 
     for (const description of splitDescriptionTextRef.current) {
-      timeline.to(
+      timeline.fromTo(
         description.lines,
+        {
+          opacity: 0,
+          y: 30,
+        },
         {
           opacity: progress,
           y: 30 * (1 - progress),
@@ -389,8 +406,12 @@ const ServicesCarousel = ({
             ease: "power2.inOut",
           });
 
-          const textInTl = gsap.timeline();
-          animateToScrollState(textInTl);
+          setTimeout(() => {
+            const textInTl = gsap.timeline();
+            splitTitleTextRef.current.forEach((split) => split.revert());
+            splitDescriptionTextRef.current.forEach((split) => split.revert());
+            animateToScrollState(textInTl);
+          }, 100);
 
           // text animations next
         },
