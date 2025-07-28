@@ -1,11 +1,8 @@
 import { useRef, useCallback, useEffect } from "react";
-import { gsap } from "gsap";
-import { SplitText } from "gsap/SplitText";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const CarouselTextContent = ({
   currentImageData,
-  scrollTriggerRef,
+  isTextHidden,
 }: {
   currentImageData: {
     image: string;
@@ -14,10 +11,13 @@ const CarouselTextContent = ({
     description: string;
     subDescription: string;
   };
-  scrollTriggerRef?: React.RefObject<ScrollTrigger>;
+  isTextHidden: boolean;
 }) => {
   return (
-    <div id="carousel-image-title-mobile" className="flex flex-col gap-3">
+    <div
+      id="carousel-image-title-mobile"
+      className={`flex flex-col gap-3 ${isTextHidden ? "text-hidden" : ""}`}
+    >
       <h1
         id="carousel-image-title-mobile"
         className="text-card-title-carousel-services"

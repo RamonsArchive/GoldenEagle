@@ -85,6 +85,7 @@ const ServicesCarousel = ({
   const splitDescriptionTextRef = useRef<SplitText[]>([]);
   const masterScrollTriggerRef = useRef<ScrollTrigger | null>(null);
   const currentTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const [isTextHidden, setIsTextHidden] = useState(false);
 
   const carouselImages = useMemo(() => {
     const allImages: ServiceImageType[] = [];
@@ -202,6 +203,8 @@ const ServicesCarousel = ({
   }, []);
 
   const createMasterScrollTrigger = () => {
+    cleanupSplitText();
+    createSplitTextInstances();
     // Kill existing master scroll trigger
     if (masterScrollTriggerRef.current) {
       masterScrollTriggerRef.current.kill();
@@ -226,15 +229,13 @@ const ServicesCarousel = ({
   };
 
   const createTextTimeline = () => {
+    // Kill existing timeline and capture progress
     cleanupSplitText();
     createSplitTextInstances();
 
-    console.log("Creating new text timeline");
-    console.log("title length", splitTitleTextRef.current.length);
-    console.log("description length", splitDescriptionTextRef.current.length);
-
-    // Kill existing timeline
+    let previousProgress = 0;
     if (currentTimelineRef.current) {
+      previousProgress = currentTimelineRef.current.progress();
       currentTimelineRef.current.kill();
     }
 
@@ -251,7 +252,7 @@ const ServicesCarousel = ({
         },
         {
           opacity: 1,
-          y: 0, // End at normal position
+          y: 0, // End at normal position (not progress!)
           ease: "power2.out",
           duration: 0.6,
           stagger: 0.05,
@@ -269,7 +270,7 @@ const ServicesCarousel = ({
         },
         {
           opacity: 1,
-          y: 0, // End at normal position
+          y: 0, // End at normal position (not progress!)
           ease: "power2.out",
           duration: 0.6,
           stagger: 0.08,
@@ -280,15 +281,130 @@ const ServicesCarousel = ({
 
     currentTimelineRef.current = timeline;
 
-    // Set timeline to current scroll progress
-    const currentProgress = scrollTriggerRef.current?.progress || 0;
-    timeline.progress(currentProgress);
+    // Get current scroll progress
+    const currentScrollProgress = scrollTriggerRef.current?.progress || 0;
+
+    console.log("Previous progress:", previousProgress);
+    console.log("Current scroll progress:", currentScrollProgress);
+
+    // ANIMATE TO the current scroll position instead of setting it directly
+    gsap.fromTo(
+      timeline,
+      { progress: 0 }, // Start from beginning
+      {
+        progress: previousProgress, // Animate to current scroll position
+        duration: 0.8, // Smooth animation duration
+        ease: "power2.out",
+        onComplete: () => {
+          console.log("Timeline animation to scroll position complete");
+        },
+      }
+    );
 
     return timeline;
   };
 
+  const createSmoothTextTransition = () => {
+    cleanupSplitText();
+    createSplitTextInstances();
+
+    const currentScrollProgress = scrollTriggerRef.current?.progress || 0;
+
+    // Kill existing timeline
+    if (currentTimelineRef.current) {
+      currentTimelineRef.current.kill();
+    }
+
+    const allElements = [
+      ...splitTitleTextRef.current.flatMap((split) => split.words),
+      ...splitDescriptionTextRef.current.flatMap((split) => split.lines),
+    ];
+
+    // Use autoAlpha (combines opacity and visibility) with immediate render
+    gsap.set(allElements, {
+      autoAlpha: 0,
+      y: -30,
+      immediateRender: true,
+    });
+
+    // Step 1: Create the scroll-controlled timeline (but don't activate yet)
+    const scrollTimeline = gsap.timeline({ paused: true });
+
+    for (const title of splitTitleTextRef.current) {
+      scrollTimeline.fromTo(
+        title.words,
+        { autoAlpha: 0, y: 30 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          ease: "power2.out",
+          duration: 0.6,
+          stagger: 0.05,
+        },
+        0
+      );
+    }
+
+    for (const description of splitDescriptionTextRef.current) {
+      scrollTimeline.fromTo(
+        description.lines,
+        { autoAlpha: 0, y: 30 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          ease: "power2.out",
+          duration: 0.6,
+          stagger: 0.08,
+        },
+        0.1
+      );
+    }
+
+    // Step 2: Create transition animation that leads into scroll timeline
+    const transitionTimeline = gsap.timeline({
+      onComplete: () => {
+        // After transition completes, activate scroll control
+        currentTimelineRef.current = scrollTimeline;
+        //scrollTimeline.progress(currentScrollProgress);
+        console.log("Transition complete, scroll control activated");
+      },
+    });
+
+    // Set initial state (from above)
+    transitionTimeline.set(
+      [
+        ...splitTitleTextRef.current.flatMap((split) => split.words),
+        ...splitDescriptionTextRef.current.flatMap((split) => split.lines),
+      ],
+      {
+        autoAlpha: 0,
+        y: -30,
+      }
+    );
+
+    // Animate to intermediate position that matches scroll progress
+    const targetY = 1 - currentScrollProgress; // Interpolate between 30 and 0
+    const targetOpacity = currentScrollProgress * 2;
+
+    transitionTimeline.to(
+      [
+        ...splitTitleTextRef.current.flatMap((split) => split.words),
+        ...splitDescriptionTextRef.current.flatMap((split) => split.lines),
+      ],
+      {
+        autoAlpha: targetOpacity,
+        y: targetY,
+        duration: 0.6,
+        ease: "power2.out",
+        stagger: 0.05,
+      }
+    );
+
+    return scrollTimeline;
+  };
+
   const createSplitTextInstances = () => {
-    console.log("createSplitTextInstances");
+    console.log("in createSplitTextInstances");
     const container = document.querySelector(
       "#carousel-text-card-container-mobile"
     );
@@ -313,7 +429,11 @@ const ServicesCarousel = ({
         splitDescriptionTextRef.current.push(split);
       }
 
-      console.log("finished creating split text instances");
+      console.log(
+        "finished creating split text instances should be 0, 4",
+        splitTitleTextRef.current.length,
+        splitDescriptionTextRef.current.length
+      );
 
       return true;
     } catch (error) {
@@ -376,7 +496,22 @@ const ServicesCarousel = ({
   };
 
   const animateTextInFromAbove = (parentTimeline: gsap.core.Timeline) => {
-    console.log("animateTextInFromAbove");
+    cleanupSplitText();
+    createSplitTextInstances();
+
+    console.log("Creating new text timeline");
+    console.log("title length", splitTitleTextRef.current.length);
+    console.log("description length", splitDescriptionTextRef.current.length);
+
+    console.log("React state title", currentServiceData.current.title);
+    console.log(
+      "React state description",
+      currentServiceData.current.description
+    );
+    console.log(
+      "React state subDescription",
+      currentServiceData.current.subDescription
+    );
 
     // First set the elements to be positioned above and invisible
     for (const title of splitTitleTextRef.current) {
@@ -399,7 +534,7 @@ const ServicesCarousel = ({
         title.words,
         {
           opacity: 1,
-          y: 0, // End at normal position
+          y: (scrollTriggerRef.current?.progress || 0) * 30, // End at normal position
           ease: "power2.out",
           duration: 0.4,
           stagger: 0.05,
@@ -413,7 +548,7 @@ const ServicesCarousel = ({
         description.lines,
         {
           opacity: 1,
-          y: 0, // End at normal position
+          y: (scrollTriggerRef.current?.progress || 0) * 30, // End at normal position
           ease: "power2.out",
           duration: 0.4,
           stagger: 0.08,
@@ -535,6 +670,7 @@ const ServicesCarousel = ({
 
   // Clean up function
   const cleanupSplitText = useCallback(() => {
+    console.log(" in cleanupSplitText");
     splitTitleTextRef.current.forEach((split) => {
       try {
         split.revert();
@@ -551,6 +687,11 @@ const ServicesCarousel = ({
     });
     splitTitleTextRef.current = [];
     splitDescriptionTextRef.current = [];
+    console.log(
+      "finished cleanupSplitText should be 0",
+      splitTitleTextRef.current.length,
+      splitDescriptionTextRef.current.length
+    );
   }, []);
 
   useEffect(() => {
@@ -569,6 +710,7 @@ const ServicesCarousel = ({
     (direction: "left" | "right") => {
       if (isAnimatingRef.current) return;
       isAnimatingRef.current = true;
+      setIsTextHidden(true);
 
       // Calculate new index immediately
       const newIndex =
@@ -588,6 +730,7 @@ const ServicesCarousel = ({
           console.log("Updating index to:", newIndex);
           setCurrentIndex(newIndex);
           isAnimatingRef.current = false;
+          cleanupSplitText();
 
           // Reset image positions
           gsap.set("#left-carousel-image-mobile", {
@@ -621,12 +764,14 @@ const ServicesCarousel = ({
                   );
                   // After the "coming down" animation completes,
                   // create the new scroll-controlled timeline
-                  createTextTimeline();
+                  //createTextTimeline();
+                  createSmoothTextTransition();
                   isAnimatingRef.current = false;
+                  setIsTextHidden(false);
                 },
               });
 
-              animateTextInFromAbove(newTimeline);
+              //animateTextInFromAbove(newTimeline);
             });
           });
         },
@@ -847,7 +992,10 @@ const ServicesCarousel = ({
           >
             {currentIndex + 1} of {carouselImages.length} images
           </p>
-          <CarouselTextContent currentImageData={currentServiceData.current} />
+          <CarouselTextContent
+            currentImageData={currentServiceData.current}
+            isTextHidden={isTextHidden}
+          />
           <div className="flex justify-end">
             <p
               id="carousel-image-view-all-photos-mobile"
