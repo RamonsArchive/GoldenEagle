@@ -50,113 +50,80 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
     "CUSTOM_HOME",
     {
       title: "Custom Home",
-      description: <>Where dreams take shape. Your sanctuary, built to last.</>,
-      subDescription: (
-        <>
-          From concept to keys, we craft homes that tell your story with every
-          detail.
-        </>
-      ),
+      description: "Where dreams take shape. Your sanctuary, built to last.",
+      subDescription:
+        "From concept to keys, we craft homes that tell your story with every detail.",
     },
   ],
   [
     "BATHROOM_REMODEL",
     {
       title: "Bathroom Remodel",
-      description: <>“Your personal retreat. Luxury in every detail.”</>,
-      subDescription: (
-        <>
-          Create a spa-like sanctuary where relaxation and style come together
-          perfectly.
-        </>
-      ),
+      description: "“Your personal retreat. Luxury in every detail.”",
+      subDescription:
+        "Create a spa-like sanctuary where relaxation and style come together perfectly.",
     },
   ],
   [
     "KITCHEN_REMODEL",
     {
       title: "Kitchen Remodel",
-      description: <>“The heart of your home. Where memories are made.”</>,
-      subDescription: (
-        <>
-          Transform your kitchen into a culinary haven where function meets
-          beautiful design.
-        </>
-      ),
+      description: "“The heart of your home. Where memories are made.”",
+      subDescription:
+        "Transform your kitchen into a culinary haven where function meets beautiful design.",
     },
   ],
   [
     "FENCES",
     {
       title: "Fences",
-      description: <>“The guard against all foes. The outer parameter.”</>,
-      subDescription: <>Define your space. Protect your peace.</>,
+      description: "“The guard against all foes. The outer parameter.”",
+      subDescription: "Define your space. Protect your peace.",
     },
   ],
   [
     "PATIO",
     {
       title: "Patio & Decks",
-      description: <>“Extend your living space. Embrace the outdoors.”</>,
-      subDescription: (
-        <>
-          Create outdoor havens where comfort meets fresh air and endless
-          possibilities.
-        </>
-      ),
+      description: "“Extend your living space. Embrace the outdoors.”",
+      subDescription:
+        "Create outdoor havens where comfort meets fresh air and endless possibilities.",
     },
   ],
   [
     "CONCRETE",
     {
       title: "Concrete",
-      description: <>“Solid foundations. Lasting impressions.”</>,
-      subDescription: (
-        <>
-          Durable concrete solutions that form the backbone of your project's
-          success.
-        </>
-      ),
+      description: "“Solid foundations. Lasting impressions.”",
+      subDescription:
+        "Durable concrete solutions that form the backbone of your project's success.",
     },
   ],
   [
     "PAINTING",
     {
       title: "Painting",
-      description: <>“A fresh coat of paint. A new beginning.”</>,
-      subDescription: (
-        <>
-          Professional finishes that breathe new life into every space, inside
-          and out.
-        </>
-      ),
+      description: "“A fresh coat of paint. A new beginning.”",
+      subDescription:
+        "Professional finishes that breathe new life into every space, inside and out.",
     },
   ],
   [
     "ROOFING",
     {
       title: "Roofing",
-      description: <>“Protecting what matters most. Above and beyond.”</>,
-      subDescription: (
-        <>
-          Strong, reliable roofing solutions that stand the test of time and
-          weather.
-        </>
-      ),
+      description: "“Protecting what matters most. Above and beyond.”",
+      subDescription:
+        "Strong, reliable roofing solutions that stand the test of time and weather.",
     },
   ],
   [
     "WINDOWS",
     {
       title: "Windows",
-      description: <>“Let the light in. Let the world in.”</>,
-      subDescription: (
-        <>
-          High-performance, energy-smart windows that flood your home with
-          natural light, optimize climate control year-round, and enhance every
-          view.
-        </>
-      ),
+      description: "“Let the light in. Let the world in.”",
+      subDescription:
+        "High-performance, energy-smart windows that flood your home with natural light, optimize climate control year-round, and enhance every view.",
     },
   ],
 ]);

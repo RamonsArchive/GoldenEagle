@@ -50,9 +50,9 @@ const animateText = (
   descDuration?: number,
   descStagger?: number
 ) => {
-  console.log([`Animating [${card.className}]`]);
-  console.log(`animating titleSplit`, titleSplit);
-  console.log(`animating descSplit`, descSplit);
+  //console.log([`Animating [${card.className}]`]);
+  //console.log(`animating titleSplit`, titleSplit);
+  //console.log(`animating descSplit`, descSplit);
   const textTl = gsap.timeline({
     scrollTrigger: {
       trigger: card,
@@ -148,8 +148,6 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
       })
       .flat();
 
-    console.log(`[${sectionName}] Found card elements:`, cardElements);
-
     // Set initial states
     gsap.set(cardElements, {
       opacity: 0,
@@ -244,15 +242,6 @@ export const useBatchCardAnimation = (config: AnimationConfig) => {
         const cardDescSplits = descElementsInCard
           .map((descEl) => descSplitMap.get(descEl))
           .filter(Boolean) as SplitText[];
-
-        console.log(
-          `[${sectionName}] Card ${cardIndex} - Title splits:`,
-          cardTitleSplits.length
-        );
-        console.log(
-          `[${sectionName}] Card ${cardIndex} - Description splits:`,
-          cardDescSplits.length
-        );
 
         // Only create timeline if we have splits to animate
         if (cardTitleSplits.length > 0 || cardDescSplits.length > 0) {

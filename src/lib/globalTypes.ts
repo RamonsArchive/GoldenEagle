@@ -78,6 +78,6 @@ export type ServiceImageType = {
 
 export type ServiceDescriptionsType = {
   title: string;
-  description: React.ReactNode;
-  subDescription: React.ReactNode;
+  description: string;
+  subDescription: string;
 }
