@@ -51,7 +51,7 @@ const useCarouselText = (currentImageData: any, scrollTriggerRef: any) => {
         end: "bottom 90%",
         scrub: 1,
         toggleActions: "play none none reverse",
-        markers: true,
+
         onUpdate: (self) => {
           scrollTriggerRef.current = self;
         },

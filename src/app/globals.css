@@ -192,6 +192,22 @@ body {
   @apply overflow-hidden h-[100dvh];
 }
 
+@utility text-card-category-photos {
+  @apply flex flex-col w-full px-5 pt-5 pb-3 gap-3 rounded-xl z-[110];
+}
+
+@utility text-card-title-category-photos {
+  @apply font-montserrat w-full font-bold italic text-[20px] xs:text-[24px] md:text-[28px] lg:text-[32px] xl:text-[40px];
+}
+
+@utility text-card-description-category-photos {
+  @apply font-montserrat text-[14px] xs:text-[16px] md:text-[18px] lg:text-[20px] xl:text-[24px];
+}
+
+@utility text-card-index-category-photos {
+  @apply font-montserrat text-[12px] text-white/80;
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }

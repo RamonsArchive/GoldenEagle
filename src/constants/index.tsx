@@ -53,6 +53,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "Where dreams take shape. Your sanctuary, built to last.",
       subDescription:
         "From concept to keys, we craft homes that tell your story with every detail.",
+      icon: "🏠",
     },
   ],
   [
@@ -62,6 +63,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“Your personal retreat. Luxury in every detail.”",
       subDescription:
         "Create a spa-like sanctuary where relaxation and style come together perfectly.",
+      icon: "🛁",
     },
   ],
   [
@@ -71,6 +73,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“The heart of your home. Where memories are made.”",
       subDescription:
         "Transform your kitchen into a culinary haven where function meets beautiful design.",
+      icon: "🍳",
     },
   ],
   [
@@ -79,6 +82,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       title: "Fences",
       description: "“The guard against all foes. The outer parameter.”",
       subDescription: "Define your space. Protect your peace.",
+      icon: "🚧",
     },
   ],
   [
@@ -88,6 +92,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“Extend your living space. Embrace the outdoors.”",
       subDescription:
         "Create outdoor havens where comfort meets fresh air and endless possibilities.",
+      icon: "🌿",
     },
   ],
   [
@@ -97,6 +102,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“Solid foundations. Lasting impressions.”",
       subDescription:
         "Durable concrete solutions that form the backbone of your project's success.",
+      icon: "🔨",
     },
   ],
   [
@@ -106,6 +112,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“A fresh coat of paint. A new beginning.”",
       subDescription:
         "Professional finishes that breathe new life into every space, inside and out.",
+      icon: "🎨",
     },
   ],
   [
@@ -115,6 +122,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“Protecting what matters most. Above and beyond.”",
       subDescription:
         "Strong, reliable roofing solutions that stand the test of time and weather.",
+      icon: "🏠",
     },
   ],
   [
@@ -124,6 +132,7 @@ export const serviceDescriptions = new Map<string, ServiceDescriptionsType>([
       description: "“Let the light in. Let the world in.”",
       subDescription:
         "High-performance, energy-smart windows that flood your home with natural light, optimize climate control year-round, and enhance every view.",
+      icon: "🪟",
     },
   ],
 ]);

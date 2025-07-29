@@ -82,6 +82,7 @@ export type ServiceDescriptionsType = {
   title: string;
   description: string;
   subDescription: string;
+  icon: string | null;
 }
 
 

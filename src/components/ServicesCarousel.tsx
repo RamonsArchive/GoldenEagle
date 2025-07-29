@@ -263,10 +263,9 @@ const ServicesCarousel = ({
     // Create a persistent ScrollTrigger that only tracks scroll progress
     masterScrollTriggerRef.current = ScrollTrigger.create({
       trigger: "#carousel-text-card-container-mobile",
-      start: "top 99%",
-      end: "bottom 90%",
+      start: "top 95%",
+      end: "bottom 85%",
       scrub: 1,
-      markers: true,
       onUpdate: (self) => {
         scrollTriggerRef.current = self;
         // Update current timeline if it exists
