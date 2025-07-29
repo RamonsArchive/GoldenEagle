@@ -174,7 +174,7 @@ body {
 }
 
 @utility mini-photo-carousel-services {
-  @apply relative z-101 shadow-xl border-1 border-white overflow-hidden rounded-xl w-[30px] h-[50px];
+  @apply relative z-101 shadow-xl border-1 border-white overflow-hidden rounded-xl w-[45px] h-[60px] xs:w-[50px] xs:h-[65px];
 }
 
 @utility real-image-before-after-about {
@@ -190,7 +190,7 @@ body {
 }
 
 @utility no-scroll {
-  @apply overflow-hidden overflow-y-hidden h-[100dvh];
+  @apply overflow-hidden h-[100dvh];
 }
 
 @keyframes shimmer {

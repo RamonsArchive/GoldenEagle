@@ -1,4 +1,3 @@
-import React from "react";
 import LazyImage from "./LazyImage";
 
 const MiniPhoto = ({
@@ -9,13 +8,14 @@ const MiniPhoto = ({
   imageAlt: string;
 }) => {
   return (
-    <div className="mini-photo-carousel-services">
+    <div className="w-full aspect-square relative rounded-xl overflow-hidden bg-slate-600/50 shadow-xl border border-white z-10">
       <LazyImage
         src={imageURL}
         alt={imageAlt || "alt"}
         isFill={true}
+        sizes="30vw"
         containerClassName="w-full h-full"
-        imageClassName="object-cover object-top overflow-hidden rounded-xl"
+        imageClassName="object-cover object-center rounded-xl transition-transform duration-300 hover:scale-105"
       />
     </div>
   );
