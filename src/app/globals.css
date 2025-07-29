@@ -8,7 +8,6 @@
 html {
   scroll-behavior: smooth;
   scrollbar-width: none;         /* “none” hides it in Firefox */
-  -ms-overflow-style: none;
 }
 
 /* 2. For WebKit browsers (Chrome, Safari, Opera) */
@@ -130,7 +129,7 @@ body {
 }
 
 @utility text-card-view-all-photos-carousel-services {
-  @apply font-montserrat font-normal italic underline text-[12px] text-white/80 cursor-pointer hover:text-gray-200  active:text-gray-200 transition-all;
+  @apply font-montserrat font-normal italic underline text-[12px] text-white/80 cursor-pointer duration-300 transform transition-all ease-in-out hover:text-gray-300/80 hover:scale-105  active:text-gray-300 ;
 } 
 
 @utility text-card-about-title {

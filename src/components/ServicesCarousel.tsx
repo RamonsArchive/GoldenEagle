@@ -456,7 +456,7 @@ const ServicesCarousel = ({
       ".text-card-title-carousel-services"
     );
     const descElements = container?.querySelectorAll(
-      ".text-card-description-carousel-services, .text-card-sub-description-carousel-services, .text-card-index-carousel-services, .text-card-view-all-photos-carousel-services"
+      ".text-card-description-carousel-services, .text-card-sub-description-carousel-services"
     );
 
     if (!titleElements || !descElements) return;
@@ -478,26 +478,6 @@ const ServicesCarousel = ({
       console.error("Error creating SplitText:", error);
       return false;
     }
-  };
-
-  const createScrollTrigger = () => {
-    cleanupSplitText();
-    createSplitTextInstances();
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#carousel-text-card-container-mobile",
-        start: "top 99%",
-        end: "bottom 90%",
-        scrub: 1,
-        toggleActions: "play none none reverse",
-        markers: true,
-        onUpdate: (self) => {
-          scrollTriggerRef.current = self;
-        },
-      },
-    });
-
-    animateTextIn(tl);
   };
 
   const animateTextOut = (parentTimeline: gsap.core.Timeline) => {
@@ -892,7 +872,7 @@ const ServicesCarousel = ({
             isTextHidden={isTextHidden}
           />
           <div
-            className="flex justify-end"
+            className="flex justify-end z-[50]"
             onClick={() => setIsViewAllPhotosVisible((prev) => !prev)}
           >
             <p
@@ -908,9 +888,9 @@ const ServicesCarousel = ({
       <ViewAllPhotos
         isVisible={isViewAllPhotosVisible}
         setIsVisible={setIsViewAllPhotosVisible}
-        currentServiceData={currentServiceData.current}
         awsData={awsServicesImages}
         serviceBackdrop={servicesData.servicesBackdrop}
+        currentServiceData={currentServiceData.current}
       />
     </>
   );

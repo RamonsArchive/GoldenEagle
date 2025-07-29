@@ -8,9 +8,9 @@ import React, {
 } from "react";
 import { NavLinkType } from "@/lib/globalTypes";
 import { navLinks } from "@/constants";
-import Lenis from "@studio-freight/lenis";
 import { ReactLenis } from "lenis/react";
 import gsap from "gsap";
+import Lenis from "lenis";
 // Define the context type
 interface NavbarContextType {
   isMobile: boolean;
@@ -19,6 +19,7 @@ interface NavbarContextType {
   scrollToSection: (sectionId: string) => void;
   activeSection: string;
   setActiveSection: (section: string) => void;
+  lenisInstance: Lenis | null;
 }
 
 // Create context with default values
@@ -29,6 +30,7 @@ const NavbarContext = createContext<NavbarContextType>({
   scrollToSection: () => {},
   activeSection: "home",
   setActiveSection: () => {},
+  lenisInstance: null,
 });
 
 // Context Provider Component
@@ -87,6 +89,7 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
     scrollToSection,
     activeSection,
     setActiveSection,
+    lenisInstance: lenisRef.current?.lenis,
   };
 
   return (
