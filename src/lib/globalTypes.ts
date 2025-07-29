@@ -64,8 +64,10 @@ export type ServicesData = {
     isBackdrop: boolean;
     category: string;
   };
-  awsServicesImages: Record<string, string[]>;
+  awsServicesImages: AwsServicesImages;
 }
+
+export type AwsServicesImages = Record<string, ServiceImageType[]>;
 
 export type ServiceImageType = {
   url: string;
@@ -77,6 +79,15 @@ export type ServiceImageType = {
 
 
 export type ServiceDescriptionsType = {
+  title: string;
+  description: string;
+  subDescription: string;
+}
+
+
+export type CurrentServiceData = {
+  image: string;
+  alt: string;
   title: string;
   description: string;
   subDescription: string;

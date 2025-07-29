@@ -173,6 +173,10 @@ body {
   @apply relative z-30 rounded-xl shadow-xl border-1 border-white overflow-hidden;
 }
 
+@utility mini-photo-carousel-services {
+  @apply relative z-101 shadow-xl border-1 border-white overflow-hidden rounded-xl w-[30px] h-[50px];
+}
+
 @utility real-image-before-after-about {
   @apply object-cover object-top w-full h-full overflow-hidden rounded-xl shadow-lg z-10;
 }
@@ -183,6 +187,10 @@ body {
 
 @utility text-hidden {
   @apply opacity-0 transform -translate-y-[30px];
+}
+
+@utility no-scroll {
+  @apply overflow-hidden overflow-y-hidden h-[100dvh];
 }
 
 @keyframes shimmer {
