@@ -585,13 +585,17 @@ const ServicesCarousel = ({
     (direction: "left" | "right") => {
       if (isAnimatingRef.current) return;
       isAnimatingRef.current = true;
-      setIsTextHidden(true);
-
       // Calculate new index immediately
       const newIndex =
         direction === "left"
           ? calculateImageIndex(currentIndex - 1)
           : calculateImageIndex(currentIndex + 1);
+
+      const animateOutTl = gsap.timeline({
+        onComplete: () => {
+          setIsTextHidden(true);
+        },
+      });
 
       const imageTl = gsap.timeline({
         onComplete: () => {
@@ -653,7 +657,8 @@ const ServicesCarousel = ({
 
       // Animate text out first
 
-      animateTextOut(imageTl);
+      animateTextOut(animateOutTl);
+      //setIsTextHidden(true);
 
       // Continue with image transition logic...
       if (direction === "right") {

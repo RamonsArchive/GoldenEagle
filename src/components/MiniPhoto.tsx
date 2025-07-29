@@ -21,6 +21,7 @@ const MiniPhoto = ({
         sizes="30vw"
         containerClassName="w-full h-full"
         imageClassName="object-cover object-center rounded-xl transition-transform duration-300 hover:scale-105"
+        priority={true}
       />
     </div>
   );

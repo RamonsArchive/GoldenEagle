@@ -12,7 +12,7 @@ const PhotoCategoryBlock = ({
   name: string;
   data: ServiceImageType[];
   icon: string | null;
-  onCategoryClick: () => void;
+  onCategoryClick: (clickedIndex: number) => void;
 }) => {
   return (
     <div className="flex flex-col gap-5 p-5 bg-slate-800/80 rounded-xl shadow-lg w-full">
@@ -21,12 +21,12 @@ const PhotoCategoryBlock = ({
         {name}
       </p>
       <div className="w-full grid grid-cols-3 xs:grid-cols-4 md:grid-cols-5 gap-5 bg-slate-700/80 rounded-xl overflow-hidden p-5 justify-items-center">
-        {data.map((item) => (
+        {data.map((item, index) => (
           <MiniPhoto
             key={item.s3Key}
             imageURL={item.url}
             imageAlt={item.alt || "alt"}
-            onCategoryClick={onCategoryClick}
+            onCategoryClick={() => onCategoryClick(index)}
           />
         ))}
       </div>

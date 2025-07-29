@@ -69,7 +69,8 @@ const ViewAllPhotos = ({
     categoryName: string,
     categoryDescription: string | null,
     categoryData: ServiceImageType[],
-    categoryIcon: string | null
+    categoryIcon: string | null,
+    clickedIndex: number
   ) => {
     console.log("categoryName", categoryName);
     console.log("categoryDescription", categoryDescription);
@@ -84,7 +85,7 @@ const ViewAllPhotos = ({
         data: categoryData,
         icon: categoryIcon,
       },
-      selectedPhotoIndex: 0,
+      selectedPhotoIndex: clickedIndex,
     }));
   };
 
@@ -165,14 +166,15 @@ const ViewAllPhotos = ({
                     }
                     icon={serviceDescriptions.get(categoryName)?.icon || null}
                     data={categoryData}
-                    onCategoryClick={() =>
+                    onCategoryClick={(clickedIndex) =>
                       openCategoryPhotos(
                         serviceDescriptions.get(categoryName)?.title ||
                           categoryName,
                         serviceDescriptions.get(categoryName)?.description ||
                           null,
                         categoryData,
-                        serviceDescriptions.get(categoryName)?.icon || null
+                        serviceDescriptions.get(categoryName)?.icon || null,
+                        clickedIndex
                       )
                     }
                   />
@@ -216,8 +218,10 @@ const ViewAllPhotos = ({
             descriptionStyle="text-card-description-category-photos"
           />
           <p className="text-card-index-category-photos px-5 pb-3 rounded-xl z-[110]">
-            {modalState?.selectedPhotoIndex ?? 0 + 1} of{" "}
-            {modalState?.selectedCategory?.data.length} images
+            {modalState?.selectedPhotoIndex !== undefined
+              ? modalState?.selectedPhotoIndex + 1
+              : 0}{" "}
+            of {modalState?.selectedCategory?.data.length} images
           </p>
 
           <div className="relative flex flex-center w-full h-full shadow-xl">
@@ -229,6 +233,7 @@ const ViewAllPhotos = ({
               containerClassName="relative flex flex-center w-full h-full rounded-b-xl"
               imageClassName="object-cover w-full h-full rounded-b-xl"
               priority={true}
+              skipIntersectionObserver={true}
             />
             <LeftImageArrow
               id="left-image-arrow"
