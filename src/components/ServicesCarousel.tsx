@@ -78,7 +78,6 @@ const ServicesCarousel = ({
   autoPlayInterval?: number;
 }) => {
   const { awsServicesImages } = servicesData;
-  console.log("servicesData", servicesData);
   const isAnimatingRef = useRef(false);
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -894,7 +893,6 @@ const ServicesCarousel = ({
         setIsVisible={setIsViewAllPhotosVisible}
         awsData={awsServicesImages}
         serviceBackdrop={servicesData.servicesBackdrop}
-        currentServiceData={currentServiceData.current}
       />
     </>
   );

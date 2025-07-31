@@ -208,6 +208,14 @@ body {
   @apply font-montserrat text-[12px] text-white/80;
 }
 
+@utility view-all-photos {
+  @apply flex-1 overflow-y-auto px-5 pb-5 min-h-0 z-[110] h-full w-full opacity-0;
+}
+
+@utility view-photos-for-category {
+  @apply flex-1 flex flex-col px-5 pb-5 min-h-0 z-[110] gap-5;
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
