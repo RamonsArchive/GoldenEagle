@@ -17,6 +17,7 @@ import TextCard from "./TextCard";
 import LeftImageArrow from "./LeftImageArrow";
 import RightImageArrow from "./RightImageArrow";
 import { ChevronLeft } from "lucide-react";
+import MemoizedPortal from "./ViewAllPhotosPortal";
 
 type ModalView = "categories" | "category-photos";
 
@@ -67,40 +68,6 @@ const ViewAllPhotos = ({
     }
   }, [isVisible]);
 
-  //   useGSAP(() => {
-  //     // Portal positioning - only runs on view changes, not photo navigation
-  //     console.log("change view in useGSAP", modalState.view);
-  //     if (
-  //       portalRef.current &&
-  //       firstMountRef.current === false &&
-  //       isVisible &&
-  //       portalAnimationCompleteRef.current === true
-  //     ) {
-  //       gsap.set(portalRef.current, {
-  //         opacity: 1,
-  //         yPercent: -100,
-  //       });
-  //     }
-  //   }, [modalState.view, isVisible]); // Only depend on view, not selectedPhotoIndex
-
-  //   useGSAP(async () => {
-  //     console.log("useGSAP in photo navigation");
-  //     if (portalRef.current && firstMountRef.current === false && isVisible) {
-  //       const selector =
-  //         modalState.view === "categories" ? "categories" : "category-photos";
-  //       gsap.to(portalRef.current, {
-  //         opacity: 1,
-  //         yPercent: 0,
-  //         duration: 0.4,
-  //         ease: "power2.inOut",
-  //         onComplete: () => {
-  //           portalAnimationCompleteRef.current = true;
-  //           animateInPhotos(selector);
-  //         },
-  //       });
-  //     }
-  //   }, [modalState.selectedPhotoIndex, isVisible]);
-
   useGSAP(async () => {
     console.log("useGSAP in photo navigation");
     if (portalRef.current && firstMountRef.current === false && isVisible) {
@@ -126,25 +93,24 @@ const ViewAllPhotos = ({
     if (firstMountRef.current === true && isVisible && portalRef.current) {
       console.log("first mount in useGSAP");
       firstMountRef.current = false;
-      setTimeout(() => {
-        gsap.fromTo(
-          portalRef.current,
-          {
-            opacity: 0,
-            yPercent: 100,
+      // setTimeout(() => {}, 5);
+      gsap.fromTo(
+        portalRef.current,
+        {
+          opacity: 0,
+          yPercent: 100,
+        },
+        {
+          opacity: 1,
+          yPercent: 0,
+          duration: 0.6,
+          ease: "power2.inOut",
+          onComplete: () => {
+            portalAnimationCompleteRef.current = true;
+            animateInPhotos("categories");
           },
-          {
-            opacity: 1,
-            yPercent: 0,
-            duration: 0.3,
-            ease: "power2.inOut",
-            onComplete: () => {
-              portalAnimationCompleteRef.current = true;
-              animateInPhotos("categories");
-            },
-          }
-        );
-      }, 5);
+        }
+      );
     }
   }, [isVisible]);
 
@@ -463,36 +429,38 @@ const ViewAllPhotos = ({
     );
   };
 
-  const ViewAllPhotosPortal = () => {
-    return createPortal(
-      <main
-        ref={portalRef}
-        id="all-photos-portal"
-        className="fixed inset-0 min-h-screen w-full h-[100dvh] bg-slate-900/90 backdrop-blur-sm z-[100] scrollbar-hide opacity-0" // transform translate-y-full opacity-0
-      >
-        <LazyImage
-          src={serviceBackdrop.url}
-          alt={serviceBackdrop.alt || "alt"}
-          isFill={true}
-          sizes="100vw"
-          containerClassName="w-full h-full opacity-15"
-          imageClassName="object-cover absolute inset-0 w-full h-full object-top opacity-15 z-15"
-        />
-        <div className="relative flex flex-col xs:hidden w-full h-full">
-          <div className="flex flex-col xs:hidden w-full h-full">
-            <div className="flex flex-row justify-end p-5 ">
-              <ToggleClose closeFunction={closeModal} />
-            </div>
-            {modalState.view === "categories" && renderAllCategoriesView()}
-            {modalState.view === "category-photos" &&
-              renderCategoryPhotosView()}
-          </div>
-        </div>
-      </main>,
-      document.body
-    );
-  };
+  // const ViewAllPhotosPortal = ({
+  //   portalRef,
+  //   serviceBackdrop,
+  //   closeModal,
+  //   modalState,
+  //   renderAllCategoriesView,
+  //   onNavigatePhoto,
+  //   onBackToCategories,
+  // }: {
+  //   portalRef: React.RefObject<HTMLDivElement>;
+  //   serviceBackdrop: ServiceImageType;
+  //   closeModal: () => void;
+  //   modalState: ModalState;
+  //   renderAllCategoriesView: () => React.ReactNode;
+  //   onNavigatePhoto: (direction: "next" | "prev") => void;
+  //   onBackToCategories: () => void;
+  // }) => {
+  //   return (
 
-  return isVisible ? <ViewAllPhotosPortal /> : null;
+  //   );
+  // };
+
+  return isVisible ? (
+    <MemoizedPortal
+      portalRef={portalRef as React.RefObject<HTMLDivElement>}
+      serviceBackdrop={serviceBackdrop}
+      closeModal={closeModal}
+      modalState={modalState}
+      renderAllCategoriesView={renderAllCategoriesView}
+      onNavigatePhoto={navigatePhoto}
+      onBackToCategories={backToAllCategories}
+    />
+  ) : null;
 };
 export default ViewAllPhotos;

@@ -10,10 +10,7 @@ const MiniPhoto = ({
   onCategoryClick: () => void;
 }) => {
   return (
-    <div
-      className="w-full aspect-square relative rounded-xl overflow-hidden bg-slate-600/50 shadow-xl border border-white z-10"
-      onClick={onCategoryClick}
-    >
+    <div className="mini-photo" onClick={onCategoryClick}>
       <LazyImage
         src={imageURL}
         alt={imageAlt || "alt"}

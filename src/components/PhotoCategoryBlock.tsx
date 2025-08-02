@@ -2,6 +2,7 @@ import React from "react";
 import { ServiceImageType } from "@/lib/globalTypes";
 import LazyImage from "./LazyImage";
 import MiniPhoto from "./MiniPhoto";
+import { useBatchCardAnimation } from "./BatchAnimation";
 
 const PhotoCategoryBlock = ({
   name,
@@ -14,9 +15,18 @@ const PhotoCategoryBlock = ({
   icon: string | null;
   onCategoryClick: (clickedIndex: number) => void;
 }) => {
+  // useBatchCardAnimation({
+  //   sectionName: "photo-category-block",
+  //   cardSelectors: [".photo-category-block"],
+  //   textSelectors: {
+  //     titles: [".photo-category-block-title"],
+  //     descriptions: [".photo-category-block-description"],
+  //   },
+  //   imageSelectors: [".mini-photo"],
+  // });
   return (
-    <div className="flex flex-col gap-5 p-5 bg-slate-800/80 rounded-xl shadow-lg w-full">
-      <p className="font-montserrat text-[20px] xs:text-[24px] md:text-[32px] font-bold flex items-center gap-2">
+    <div className="photo-category-block">
+      <p className="photo-category-block-title">
         {icon && <span className="text-[24px]">{icon}</span>}
         {name}
       </p>
