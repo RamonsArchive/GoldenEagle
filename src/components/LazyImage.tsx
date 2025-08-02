@@ -50,7 +50,7 @@ const LazyImage = ({
     >
       {/* Placeholder skeleton - only show for non-fill images */}
       {!isLoaded && !isFill && (
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-xl" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-xl z-[110]" />
       )}
 
       {/* Load image when should show */}
